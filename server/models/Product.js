@@ -40,14 +40,66 @@ const productSchema = new mongoose.Schema(
     isAvailable: {
       type: Boolean,
       default: true
+    },
+    brand: {
+      type: String,
+      trim: true
+    },
+    rating: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 5,
+      set: val => Math.round(val * 10) / 10 // Round to 1 decimal place
+    },
+    reviewCount: {
+      type: Number,
+      default: 0
+    },
+    soldCount: {
+      type: Number,
+      default: 0
+    },
+    features: {
+      type: [String],
+      default: []
+    },
+    specifications: {
+      type: Map,
+      of: String,
+      default: {}
+    },
+    warranty: {
+      type: String,
+      default: 'No warranty'
+    },
+    returnPolicy: {
+      type: String,
+      default: 'No returns'
+    },
+    originalPrice: {
+      type: Number,
+      min: [0, 'Original price cannot be negative']
+    },
+    deliveryTime: {
+      type: String,
+      default: '3-5 business days'
     }
   },
   {
     timestamps: true,
-    versionKey: false
+    versionKey: false,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
   }
 );
 
-productSchema.index({ name: 'text', category: 'text', description: 'text' });
+// Indexes
+productSchema.index({ name: 'text', category: 'text', description: 'text', brand: 'text' });
+productSchema.index({ price: 1 });
+productSchema.index({ rating: -1 });
+productSchema.index({ createdAt: -1 });
+productSchema.index({ shopOwnerId: 1 });
+productSchema.index({ isAvailable: 1 });
 
 module.exports = mongoose.model('Product', productSchema);

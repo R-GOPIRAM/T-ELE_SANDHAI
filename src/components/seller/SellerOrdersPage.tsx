@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { Package, Clock, CheckCircle, XCircle, Truck, MapPin, Phone, Mail, Eye, Edit } from 'lucide-react';
-import { mockOrders } from '../../data/mockData';
+import React, { useState, useEffect } from 'react';
+import { Package, Clock, CheckCircle, XCircle, Truck, MapPin, Phone, Mail, Eye } from 'lucide-react';
+import api from '../../services/api';
 import { Order } from '../../types';
 import { useAuth } from '../../hooks/useAuth';
 import Button from '../common/Button';
+import LoadingSpinner from '../common/LoadingSpinner';
 
 interface SellerOrdersPageProps {
   onPageChange: (page: string) => void;
@@ -11,81 +12,53 @@ interface SellerOrdersPageProps {
 
 export default function SellerOrdersPage({ onPageChange }: SellerOrdersPageProps) {
   const { user } = useAuth();
-  const [orders, setOrders] = useState<Order[]>([
-    ...mockOrders,
-    {
-      id: 'order2',
-      customerId: 'customer2',
-      customerName: 'Priya Nair',
-      customerEmail: 'priya@example.com',
-      customerPhone: '+91 88776 65432',
-      items: [
-        {
-          productId: '3',
-          sellerId: 'seller1',
-          productName: 'Samsung Galaxy S24 Ultra',
-          sellerName: 'TechZone Electronics',
-          quantity: 1,
-          price: 124999,
-          subtotal: 124999
-        }
-      ],
-      totalAmount: 124999,
-      deliveryAddress: '456 Garden Street, Mylapore, Chennai - 600004',
-      deliveryType: 'delivery',
-      paymentMethod: 'UPI',
-      status: 'confirmed',
-      createdAt: '2024-01-30T10:15:00Z',
-      updatedAt: '2024-01-30T10:15:00Z',
-      estimatedDelivery: '2024-02-03T18:00:00Z'
-    },
-    {
-      id: 'order3',
-      customerId: 'customer3',
-      customerName: 'Vikram Singh',
-      customerEmail: 'vikram@example.com',
-      customerPhone: '+91 77665 54321',
-      items: [
-        {
-          productId: '1',
-          sellerId: 'seller1',
-          productName: 'iPhone 15 Pro',
-          sellerName: 'TechZone Electronics',
-          quantity: 2,
-          price: 134900,
-          subtotal: 269800
-        }
-      ],
-      totalAmount: 269800,
-      deliveryType: 'pickup',
-      paymentMethod: 'Cash',
-      status: 'pending',
-      createdAt: '2024-01-31T16:30:00Z',
-      updatedAt: '2024-01-31T16:30:00Z'
-    }
-  ]);
-
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
-  // Filter orders for current seller
-  const sellerOrders = orders.filter(order => 
-    order.items.some(item => item.sellerId === user?.id || item.sellerId === 'seller1')
-  );
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const { data } = await api.get('/orders/seller-orders');
+        const formattedOrders = data.data.map((o: any) => ({
+          ...o,
+          id: String(o.orderId || o.id || o._id || 'unknown'),
+          status: (o.orderStatus || o.status || 'pending').toLowerCase(),
+          items: o.items.map((i: any) => ({
+            ...i,
+            productName: i.name || i.productName || 'Product',
+            sellerName: i.seller?.name || i.sellerName || 'Seller',
+            subtotal: (i.price * i.quantity) || i.subtotal || 0,
+            price: i.price || 0,
+            quantity: i.quantity || 1
+          }))
+        }));
+        setOrders(formattedOrders);
+      } catch (error) {
+        console.error('Failed to fetch orders', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const filteredOrders = sellerOrders.filter(order => 
-    statusFilter === 'all' || order.status === statusFilter
-  );
+    fetchOrders();
+  }, []);
 
-  const updateOrderStatus = (orderId: string, newStatus: Order['status']) => {
-    setOrders(prev => prev.map(order => 
-      order.id === orderId 
-        ? { ...order, status: newStatus, updatedAt: new Date().toISOString() }
-        : order
-    ));
-    
-    if (selectedOrder?.id === orderId) {
-      setSelectedOrder(prev => prev ? { ...prev, status: newStatus } : null);
+  const updateOrderStatus = async (orderId: string, newStatus: Order['status']) => {
+    try {
+      const { data } = await api.put(`/orders/${orderId}`, { status: newStatus });
+      const updatedOrder = data.data;
+
+      setOrders(prev => prev.map(order =>
+        order.id === orderId ? updatedOrder : order
+      ));
+
+      if (selectedOrder?.id === orderId) {
+        setSelectedOrder(updatedOrder);
+      }
+    } catch (error) {
+      console.error('Failed to update order status', error);
     }
   };
 
@@ -130,6 +103,13 @@ export default function SellerOrdersPage({ onPageChange }: SellerOrdersPageProps
     return statusFlow[currentStatus as keyof typeof statusFlow] as Order['status'] || null;
   };
 
+  // Orders are already filtered by backend for the seller
+  const sellerOrders = orders;
+
+  const filteredOrders = sellerOrders.filter(order =>
+    statusFilter === 'all' || order.status === statusFilter
+  );
+
   const orderStats = {
     total: sellerOrders.length,
     pending: sellerOrders.filter(o => o.status === 'pending').length,
@@ -137,6 +117,14 @@ export default function SellerOrdersPage({ onPageChange }: SellerOrdersPageProps
     shipped: sellerOrders.filter(o => o.status === 'shipped').length,
     delivered: sellerOrders.filter(o => o.status === 'delivered').length
   };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-12 min-h-screen bg-gray-50">
+        <LoadingSpinner />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -185,11 +173,10 @@ export default function SellerOrdersPage({ onPageChange }: SellerOrdersPageProps
                 <button
                   key={tab.key}
                   onClick={() => setStatusFilter(tab.key)}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                    statusFilter === tab.key
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
+                  className={`py-4 px-1 border-b-2 font-medium text-sm ${statusFilter === tab.key
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
                 >
                   {tab.label} ({tab.count})
                 </button>
@@ -207,14 +194,13 @@ export default function SellerOrdersPage({ onPageChange }: SellerOrdersPageProps
                   Orders ({filteredOrders.length})
                 </h2>
               </div>
-              
+
               <div className="divide-y divide-gray-200">
                 {filteredOrders.map((order) => (
                   <div
                     key={order.id}
-                    className={`p-6 cursor-pointer hover:bg-gray-50 transition-colors ${
-                      selectedOrder?.id === order.id ? 'bg-blue-50 border-l-4 border-blue-500' : ''
-                    }`}
+                    className={`p-6 cursor-pointer hover:bg-gray-50 transition-colors ${selectedOrder?.id === order.id ? 'bg-blue-50 border-l-4 border-blue-500' : ''
+                      }`}
                     onClick={() => setSelectedOrder(order)}
                   >
                     <div className="flex items-start justify-between">
@@ -222,14 +208,14 @@ export default function SellerOrdersPage({ onPageChange }: SellerOrdersPageProps
                         <div className="flex items-center space-x-3 mb-2">
                           <Package className="w-5 h-5 text-gray-400" />
                           <h3 className="text-lg font-semibold text-gray-900">
-                            Order #{order.id.toUpperCase()}
+                            Order #{order.id.slice(-6).toUpperCase()}
                           </h3>
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(order.status)}`}>
                             {getStatusIcon(order.status)}
                             <span className="ml-1 capitalize">{order.status}</span>
                           </span>
                         </div>
-                        
+
                         <div className="space-y-1 text-sm text-gray-600">
                           <div className="flex items-center">
                             <Mail className="w-4 h-4 mr-2" />
@@ -250,7 +236,7 @@ export default function SellerOrdersPage({ onPageChange }: SellerOrdersPageProps
                             {order.deliveryType === 'pickup' ? 'Store Pickup' : 'Home Delivery'}
                           </div>
                         </div>
-                        
+
                         <div className="mt-3 flex items-center justify-between">
                           <div className="text-lg font-bold text-gray-900">
                             ₹{order.totalAmount.toLocaleString()}
@@ -260,7 +246,7 @@ export default function SellerOrdersPage({ onPageChange }: SellerOrdersPageProps
                           </div>
                         </div>
                       </div>
-                      
+
                       <Button
                         variant="outline"
                         size="sm"
@@ -276,7 +262,7 @@ export default function SellerOrdersPage({ onPageChange }: SellerOrdersPageProps
                   </div>
                 ))}
               </div>
-              
+
               {filteredOrders.length === 0 && (
                 <div className="p-12 text-center">
                   <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
@@ -300,7 +286,7 @@ export default function SellerOrdersPage({ onPageChange }: SellerOrdersPageProps
                     </span>
                   </div>
                 </div>
-                
+
                 <div className="p-6 space-y-6">
                   {/* Customer Information */}
                   <div>
@@ -394,10 +380,10 @@ export default function SellerOrdersPage({ onPageChange }: SellerOrdersPageProps
                             onClick={() => updateOrderStatus(selectedOrder.id, getNextStatus(selectedOrder.status)!)}
                             className="w-full"
                           >
-                            Mark as {getNextStatus(selectedOrder.status)?.charAt(0).toUpperCase() + getNextStatus(selectedOrder.status)?.slice(1)}
+                            Mark as {getNextStatus(selectedOrder.status)!.charAt(0).toUpperCase() + getNextStatus(selectedOrder.status)!.slice(1)}
                           </Button>
                         )}
-                        
+
                         {selectedOrder.status === 'pending' && (
                           <Button
                             variant="danger"

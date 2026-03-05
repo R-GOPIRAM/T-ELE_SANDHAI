@@ -16,15 +16,27 @@ export interface Seller extends User {
   businessAddress: string;
   businessPhone: string;
   verificationStatus: 'pending' | 'approved' | 'rejected';
+  approvedAt?: string;
+  rejectedAt?: string;
+  rejectionReason?: string;
   documents: {
     aadhaar?: string;
     pan?: string;
     gstin?: string;
     laborCert?: string;
   };
-  approvedAt?: string;
-  rejectedAt?: string;
-  rejectionReason?: string;
+}
+
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+export interface RegisterData {
+  name: string;
+  email: string;
+  password: string;
+  role?: 'customer' | 'seller' | 'admin';
 }
 
 export interface Product {
@@ -48,14 +60,18 @@ export interface Product {
   reviewCount: number;
   createdAt: string;
   updatedAt: string;
+  warranty?: string;
+  returnPolicy?: string;
+  deliveryTime?: string;
 }
 
 export interface CartItem {
   id: string;
   productId: string;
-  sellerId: string;
   quantity: number;
   price: number;
+  product?: Product; // Optional for compatibility, but store fills it
+  sellerId?: string;
 }
 
 export interface Order {

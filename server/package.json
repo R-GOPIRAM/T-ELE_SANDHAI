@@ -1,3 +1,25 @@
 {
-  "type": "commonjs"
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "cross-env NODE_ENV=test jest --runInBand"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "express-rate-limit": "^8.2.1",
+    "helmet": "^8.1.0",
+    "morgan": "^1.10.1",
+    "razorpay": "^2.9.6",
+    "socket.io": "^4.8.3",
+    "winston": "^3.19.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "cross-env": "^10.1.0",
+    "jest": "^30.2.0",
+    "mongodb-memory-server": "^11.0.1",
+    "supertest": "^7.2.2"
+  }
 }

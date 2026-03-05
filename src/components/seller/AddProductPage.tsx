@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Package, Upload, Save, ArrowLeft, X } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import Button from '../common/Button';
+import api from '../../services/api';
 
 interface AddProductPageProps {
   onPageChange: (page: string) => void;
@@ -76,7 +77,7 @@ export default function AddProductPage({ onPageChange }: AddProductPageProps) {
     const files = Array.from(e.target.files || []);
     // In a real app, you would upload these to a storage service
     // For now, we'll use placeholder URLs
-    const imageUrls = files.map((_, index) => 
+    const imageUrls = files.map((_, index) =>
       `https://images.pexels.com/photos/788946/pexels-photo-788946.jpeg?auto=compress&cs=tinysrgb&w=400`
     );
     setFormData({
@@ -85,46 +86,59 @@ export default function AddProductPage({ onPageChange }: AddProductPageProps) {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validate required fields
     if (!formData.name || !formData.brand || !formData.price || !formData.category) {
       alert('Please fill in all required fields');
       return;
     }
 
-    // Create new product
-    const newProduct: Product = {
-      id: Math.random().toString(36).substr(2, 9),
-      sellerId: user?.id || 'seller1',
-      sellerName: user?.name || 'Your Store',
-      sellerLocation: 'Chennai', // This would come from seller profile
-      name: formData.name,
-      brand: formData.brand,
-      description: formData.description,
-      price: parseInt(formData.price),
-      originalPrice: formData.originalPrice ? parseInt(formData.originalPrice) : undefined,
-      category: formData.category,
-      subcategory: formData.subcategory,
-      images: formData.images.length > 0 ? formData.images : ['https://images.pexels.com/photos/788946/pexels-photo-788946.jpeg'],
-      features: formData.features.filter(f => f.trim() !== ''),
-      specifications: formData.specifications.reduce((acc, spec) => {
-        if (spec.key && spec.value) {
-          acc[spec.key] = spec.value;
-        }
-        return acc;
-      }, {} as Record<string, string>),
-      stock: parseInt(formData.stock) || 0,
-      isAvailable: true,
-      rating: 0,
-      reviewCount: 0,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
+    try {
+      // Create new product payload
+      // Note: Backend expects 'body' properties directly, not wrapped in 'product' object depending on controller implementation.
+      // Controller uses req.body directly. Service adds shopOwnerId.
 
-    alert('Product added successfully!');
-    onPageChange('seller-dashboard');
+      const price = parseInt(formData.price);
+      const originalPrice = formData.originalPrice ? parseInt(formData.originalPrice) : undefined;
+      const stock = parseInt(formData.stock) || 0;
+
+      if (isNaN(price)) {
+        alert('Invalid price');
+        return;
+      }
+
+      const productPayload = {
+        name: formData.name,
+        brand: formData.brand,
+        description: formData.description,
+        price: price,
+        originalPrice: isNaN(originalPrice as number) ? undefined : originalPrice,
+        category: formData.category,
+        subcategory: formData.subcategory,
+        // Ensure at least one image if possible, or use placeholder
+        images: formData.images.length > 0 ? formData.images : ['https://images.pexels.com/photos/788946/pexels-photo-788946.jpeg?auto=compress&cs=tinysrgb&w=400'],
+        features: formData.features.filter(f => f.trim() !== ''),
+        specifications: formData.specifications.reduce((acc, spec) => {
+          if (spec.key && spec.value) {
+            acc[spec.key] = spec.value;
+          }
+          return acc;
+        }, {} as Record<string, string>),
+        stock: stock,
+        isAvailable: true
+      };
+
+      await api.post('/products', productPayload);
+
+      alert('Product added successfully!');
+      onPageChange('seller-dashboard');
+    } catch (error: any) {
+      console.error('Failed to add product', error);
+      alert(`Failed to add product: ${error.response?.data?.message || error.message}`);
+    }
   };
 
   return (
@@ -295,7 +309,7 @@ export default function AddProductPage({ onPageChange }: AddProductPageProps) {
                 </div>
                 <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB (Max 5 images)</p>
               </div>
-              
+
               {formData.images.length > 0 && (
                 <div className="mt-6 grid grid-cols-2 md:grid-cols-5 gap-4">
                   {formData.images.map((image, index) => (

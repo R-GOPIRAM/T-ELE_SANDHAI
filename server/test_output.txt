@@ -1,0 +1,32 @@
+
+> test
+> cross-env NODE_ENV=test jest --runInBand server/tests/authRotation.test.js
+
+  console.log
+    [dotenv@17.2.3] injecting env (11) from .env -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+
+      at _log (../node_modules/dotenv/lib/main.js:142:11)
+
+(node:9032) [MONGODB DRIVER] Warning: useNewUrlParser is a deprecated option: useNewUrlParser has no effect since Node.js Driver version 4.0.0 and will be removed in the next major version
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:9032) [MONGODB DRIVER] Warning: useUnifiedTopology is a deprecated option: useUnifiedTopology has no effect since Node.js Driver version 4.0.0 and will be removed in the next major version
+[32minfo[39m: [API INFO] POST /api/auth/signup - 200 - 618ms {"durationMs":618,"ip":"::ffff:127.0.0.1","method":"POST","service":"tele-sandhai-api","status":200,"timestamp":"2026-03-05 21:09:24","url":"/api/auth/signup","user":"unauthenticated","userAgent":"unknown"}
+[32minfo[39m: [API INFO] POST /api/auth/login - 200 - 321ms {"durationMs":321,"ip":"::ffff:127.0.0.1","method":"POST","service":"tele-sandhai-api","status":200,"timestamp":"2026-03-05 21:09:25","url":"/api/auth/login","user":"unauthenticated","userAgent":"unknown"}
+[32minfo[39m: [API INFO] POST /api/auth/signup - 200 - 364ms {"durationMs":364,"ip":"::ffff:127.0.0.1","method":"POST","service":"tele-sandhai-api","status":200,"timestamp":"2026-03-05 21:09:25","url":"/api/auth/signup","user":"unauthenticated","userAgent":"unknown"}
+[32minfo[39m: [API INFO] POST /api/auth/login - 200 - 380ms {"durationMs":380,"ip":"::ffff:127.0.0.1","method":"POST","service":"tele-sandhai-api","status":200,"timestamp":"2026-03-05 21:09:25","url":"/api/auth/login","user":"unauthenticated","userAgent":"unknown"}
+[32minfo[39m: [API INFO] POST /api/auth/refresh - 200 - 10ms {"durationMs":10,"ip":"::ffff:127.0.0.1","method":"POST","service":"tele-sandhai-api","status":200,"timestamp":"2026-03-05 21:09:25","url":"/api/auth/refresh","user":"unauthenticated","userAgent":"unknown"}
+[33mwarn[39m: [API WARN] POST /api/auth/refresh - 401 - 8ms {"durationMs":8,"ip":"::ffff:127.0.0.1","method":"POST","service":"tele-sandhai-api","status":401,"timestamp":"2026-03-05 21:09:26","url":"/api/auth/refresh","user":"unauthenticated","userAgent":"unknown"}
+[33mwarn[39m: [API WARN] POST /api/auth/refresh - 401 - 0ms {"durationMs":0,"ip":"::ffff:127.0.0.1","method":"POST","service":"tele-sandhai-api","status":401,"timestamp":"2026-03-05 21:09:26","url":"/api/auth/refresh","user":"unauthenticated","userAgent":"unknown"}
+[33mwarn[39m: [API WARN] POST /api/auth/refresh - 401 - 1ms {"durationMs":1,"ip":"::ffff:127.0.0.1","method":"POST","service":"tele-sandhai-api","status":401,"timestamp":"2026-03-05 21:09:26","url":"/api/auth/refresh","user":"unauthenticated","userAgent":"unknown"}
+PASS tests/authRotation.test.js
+  Auth Token Rotation and Secure Cookies
+    √ should set httpOnly cookies on login (1055 ms)
+    √ should rotate refresh token on /auth/refresh (813 ms)
+    √ should fail if refresh token is missing or invalid (19 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       3 passed, 3 total
+Snapshots:   0 total
+Time:        4.911 s, estimated 9 s
+Ran all test suites matching server/tests/authRotation.test.js.
+Force exiting Jest: Have you considered using `--detectOpenHandles` to detect async operations that kept running after all tests finished?

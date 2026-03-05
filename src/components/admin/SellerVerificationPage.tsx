@@ -1,80 +1,75 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CheckCircle, XCircle, Eye, FileText, Store, User, Phone, MapPin, Calendar, AlertTriangle } from 'lucide-react';
-import { mockSellers } from '../../data/mockData';
 import { Seller } from '../../types';
 import Button from '../common/Button';
+import api from '../../services/api';
+import { useAuth } from '../../hooks/useAuth';
 
 interface SellerVerificationPageProps {
   onPageChange: (page: string) => void;
 }
 
 export default function SellerVerificationPage({ onPageChange }: SellerVerificationPageProps) {
+  const { user } = useAuth();
   const [selectedSeller, setSelectedSeller] = useState<Seller | null>(null);
   const [filter, setFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
-  const [sellers, setSellers] = useState<Seller[]>([
-    ...mockSellers,
-    {
-      id: 'seller3',
-      email: 'gadgethub@example.com',
-      name: 'Suresh Patel',
-      role: 'seller',
-      businessName: 'Gadget Hub',
-      businessAddress: '789 Tech Street, Adyar, Chennai - 600020',
-      businessPhone: '+91 76543 21098',
-      gstin: '33KLMNO9012P3Q7',
-      panNumber: 'KLMNO9012P',
-      verificationStatus: 'pending',
-      documents: {
-        aadhaar: 'aadhaar-doc-3.pdf',
-        pan: 'pan-doc-3.pdf',
-        gstin: 'gstin-doc-3.pdf'
-      }
-    },
-    {
-      id: 'seller4',
-      email: 'electromart@example.com',
-      name: 'Kavitha Reddy',
-      role: 'seller',
-      businessName: 'ElectroMart',
-      businessAddress: '321 Electronics Plaza, Velachery, Chennai - 600042',
-      businessPhone: '+91 65432 10987',
-      gstin: '33RSTUV3456W4X8',
-      panNumber: 'RSTUV3456W',
-      verificationStatus: 'pending',
-      documents: {
-        aadhaar: 'aadhaar-doc-4.pdf',
-        pan: 'pan-doc-4.pdf',
-        gstin: 'gstin-doc-4.pdf',
-        laborCert: 'labor-cert-4.pdf'
-      }
-    }
-  ]);
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  const [loading, setLoading] = useState(true);
+  const [sellers, setSellers] = useState<Seller[]>([]);
 
-  const filteredSellers = sellers.filter(seller => 
+  useEffect(() => {
+    fetchSellers();
+  }, [user]);
+
+  const fetchSellers = async () => {
+    try {
+      const { data } = await api.get('/sellers/admin/all');
+      setSellers(data.data);
+    } catch (error: any) {
+      console.error('Failed to fetch sellers', error);
+    } finally {
+      if (loading) setLoading(false);
+    }
+  };
+
+  const filteredSellers = sellers.filter(seller =>
     filter === 'all' || seller.verificationStatus === filter
   );
 
-  const handleApprove = (sellerId: string) => {
-    setSellers(prev => prev.map(seller => 
-      seller.id === sellerId 
-        ? { ...seller, verificationStatus: 'approved' as const, approvedAt: new Date().toISOString() }
-        : seller
-    ));
-    setSelectedSeller(null);
+  const handleApprove = async (sellerId: string) => {
+    try {
+      await api.patch(`/sellers/${sellerId}/verify`, { status: 'approved' });
+      setSellers(prev => prev.map(seller =>
+        (seller.id === sellerId || (seller as any)._id === sellerId)
+          ? { ...seller, verificationStatus: 'approved' as const, approvedAt: new Date().toISOString() }
+          : seller
+      ));
+      setSelectedSeller(null);
+    } catch (error) {
+      console.error('Failed to approve seller', error);
+      alert('Failed to approve seller');
+    }
   };
 
-  const handleReject = (sellerId: string, reason: string) => {
-    setSellers(prev => prev.map(seller => 
-      seller.id === sellerId 
-        ? { 
-            ...seller, 
-            verificationStatus: 'rejected' as const, 
+  const handleReject = async (sellerId: string, reason: string) => {
+    try {
+      await api.patch(`/sellers/${sellerId}/verify`, { status: 'rejected', reason });
+      setSellers(prev => prev.map(seller =>
+        (seller.id === sellerId || (seller as any)._id === sellerId)
+          ? {
+            ...seller,
+            verificationStatus: 'rejected' as const,
             rejectedAt: new Date().toISOString(),
             rejectionReason: reason
           }
-        : seller
-    ));
-    setSelectedSeller(null);
+          : seller
+      ));
+      setSelectedSeller(null);
+    } catch (error) {
+      console.error('Failed to reject seller', error);
+      alert('Failed to reject seller');
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -97,6 +92,14 @@ export default function SellerVerificationPage({ onPageChange }: SellerVerificat
     }
   };
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -118,11 +121,10 @@ export default function SellerVerificationPage({ onPageChange }: SellerVerificat
                 <button
                   key={tab.key}
                   onClick={() => setFilter(tab.key as any)}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                    filter === tab.key
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
+                  className={`py-4 px-1 border-b-2 font-medium text-sm ${filter === tab.key
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
                 >
                   {tab.label} ({tab.count})
                 </button>
@@ -140,14 +142,13 @@ export default function SellerVerificationPage({ onPageChange }: SellerVerificat
                   Seller Applications ({filteredSellers.length})
                 </h2>
               </div>
-              
+
               <div className="divide-y divide-gray-200">
                 {filteredSellers.map((seller) => (
                   <div
-                    key={seller.id}
-                    className={`p-6 cursor-pointer hover:bg-gray-50 transition-colors ${
-                      selectedSeller?.id === seller.id ? 'bg-blue-50 border-l-4 border-blue-500' : ''
-                    }`}
+                    key={(seller as any)._id || seller.id}
+                    className={`p-6 cursor-pointer hover:bg-gray-50 transition-colors ${selectedSeller?.id === seller.id || (selectedSeller as any)?._id === (seller as any)._id ? 'bg-blue-50 border-l-4 border-blue-500' : ''
+                      }`}
                     onClick={() => setSelectedSeller(seller)}
                   >
                     <div className="flex items-start justify-between">
@@ -162,7 +163,7 @@ export default function SellerVerificationPage({ onPageChange }: SellerVerificat
                             <span className="ml-1 capitalize">{seller.verificationStatus}</span>
                           </span>
                         </div>
-                        
+
                         <div className="space-y-1 text-sm text-gray-600">
                           <div className="flex items-center">
                             <User className="w-4 h-4 mr-2" />
@@ -177,7 +178,7 @@ export default function SellerVerificationPage({ onPageChange }: SellerVerificat
                             {seller.businessAddress}
                           </div>
                         </div>
-                        
+
                         <div className="mt-3 flex items-center space-x-4 text-xs text-gray-500">
                           {seller.gstin && (
                             <span>GST: {seller.gstin}</span>
@@ -188,7 +189,7 @@ export default function SellerVerificationPage({ onPageChange }: SellerVerificat
                           </span>
                         </div>
                       </div>
-                      
+
                       <Button
                         variant="outline"
                         size="sm"
@@ -204,7 +205,7 @@ export default function SellerVerificationPage({ onPageChange }: SellerVerificat
                   </div>
                 ))}
               </div>
-              
+
               {filteredSellers.length === 0 && (
                 <div className="p-12 text-center">
                   <Store className="w-12 h-12 text-gray-400 mx-auto mb-4" />
@@ -228,7 +229,7 @@ export default function SellerVerificationPage({ onPageChange }: SellerVerificat
                     </span>
                   </div>
                 </div>
-                
+
                 <div className="p-6 space-y-6">
                   {/* Business Information */}
                   <div>
@@ -315,7 +316,7 @@ export default function SellerVerificationPage({ onPageChange }: SellerVerificat
                         <Button
                           variant="success"
                           icon={CheckCircle}
-                          onClick={() => handleApprove(selectedSeller.id)}
+                          onClick={() => handleApprove((selectedSeller as any)._id || selectedSeller.id)}
                           className="w-full"
                         >
                           Approve Seller
@@ -325,7 +326,7 @@ export default function SellerVerificationPage({ onPageChange }: SellerVerificat
                           icon={XCircle}
                           onClick={() => {
                             const reason = prompt('Enter rejection reason:');
-                            if (reason) handleReject(selectedSeller.id, reason);
+                            if (reason) handleReject((selectedSeller as any)._id || selectedSeller.id, reason);
                           }}
                           className="w-full"
                         >

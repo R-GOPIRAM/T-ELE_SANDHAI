@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ShoppingCart, Plus, Minus, Trash2, MapPin, CreditCard, Truck, Store, ArrowLeft } from 'lucide-react';
 import { useCart } from '../../hooks/useCart';
 import { useAuth } from '../../hooks/useAuth';
-import { mockProducts } from '../../data/mockData';
 import Button from '../common/Button';
 
 interface CartPageProps {
@@ -10,43 +9,53 @@ interface CartPageProps {
 }
 
 export default function CartPage({ onPageChange }: CartPageProps) {
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   const { items, updateQuantity, removeFromCart, clearCart, getTotalPrice } = useCart();
   const { user } = useAuth();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [deliveryType, setDeliveryType] = useState<'delivery' | 'pickup'>('delivery');
   const [paymentMethod, setPaymentMethod] = useState('card');
-  const [deliveryAddress, setDeliveryAddress] = useState('');
+
+  // Structured address state
+  const [addressForm, setAddressForm] = useState({
+    street: '',
+    city: '',
+    state: '',
+    zipCode: '',
+    country: 'India',
+    phone: ''
+  });
+
   const [customerDetails, setCustomerDetails] = useState({
     name: user?.name || '',
     phone: '',
     email: user?.email || ''
   });
 
-  // Get product details for cart items
-  const cartItemsWithDetails = items.map(item => {
-    const product = mockProducts.find(p => p.id === item.productId);
-    return {
-      ...item,
-      product
-    };
-  }).filter(item => item.product);
+  // Ensure items have product details
+  const validItems = items.filter(item => item.product);
 
   // Group items by seller
-  const itemsBySeller = cartItemsWithDetails.reduce((acc, item) => {
-    const sellerId = item.product!.sellerId;
+  const itemsBySeller = validItems.reduce((acc, item) => {
+    const product = item.product!;
+    // Fallback if seller info is missing in product type for now, but backend sends it
+    // We might need to fetch seller details or store them in product object
+    // For now assuming product has sellerId and sellerName (from populated backend response)
+    const sellerId = product.sellerId;
+
     if (!acc[sellerId]) {
       acc[sellerId] = {
         seller: {
           id: sellerId,
-          name: item.product!.sellerName,
-          location: item.product!.sellerLocation
+          name: product.sellerName || 'Seller',
+          location: product.sellerLocation || 'Unknown'
         },
         items: []
       };
     }
     acc[sellerId].items.push(item);
     return acc;
-  }, {} as Record<string, { seller: { id: string; name: string; location: string }; items: typeof cartItemsWithDetails }>);
+  }, {} as Record<string, { seller: { id: string; name: string; location: string }; items: typeof items }>);
 
   const handleQuantityChange = (itemId: string, newQuantity: number) => {
     if (newQuantity <= 0) {
@@ -56,30 +65,44 @@ export default function CartPage({ onPageChange }: CartPageProps) {
     }
   };
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (!user) {
       onPageChange('login');
       return;
     }
 
-    if (deliveryType === 'delivery' && !deliveryAddress.trim()) {
-      alert('Please enter delivery address');
-      return;
+    if (deliveryType === 'delivery') {
+      if (!addressForm.street || !addressForm.city || !addressForm.state || !addressForm.zipCode || !customerDetails.phone) {
+        alert('Please fill in all address and contact details');
+        return;
+      }
     }
 
     if (!customerDetails.name || !customerDetails.phone) {
-      alert('Please fill in all required details');
+      alert('Please fill in all required customer details');
       return;
     }
 
-    // Simulate checkout process
     setIsCheckingOut(true);
-    setTimeout(() => {
-      alert('Order placed successfully! You will receive confirmation shortly.');
-      clearCart();
+    try {
+      // Save checkout data to localStorage so PaymentPage can calculate totals and build final payload
+      const checkoutData = items.map(item => ({ ...item.product, quantity: item.quantity, price: item.price }));
+      localStorage.setItem('cart', JSON.stringify(checkoutData));
+      localStorage.setItem('checkoutInfo', JSON.stringify({
+        addressForm,
+        customerDetails,
+        deliveryType,
+        paymentMethod
+      }));
+
+      // Navigate to PaymentPage to initialize Razorpay logic
+      onPageChange('payment');
+    } catch (error: any) {
+      console.error('Checkout failed', error);
+      alert('Failed to initialize checkout.');
+    } finally {
       setIsCheckingOut(false);
-      onPageChange('browse');
-    }, 2000);
+    }
   };
 
   const deliveryFee = deliveryType === 'delivery' ? 50 : 0;
@@ -154,7 +177,7 @@ export default function CartPage({ onPageChange }: CartPageProps) {
                           alt={item.product!.name}
                           className="w-20 h-20 object-cover rounded-lg"
                         />
-                        
+
                         <div className="flex-1">
                           <h4 className="font-semibold text-gray-900">{item.product!.name}</h4>
                           <p className="text-gray-600 text-sm">{item.product!.brand}</p>
@@ -237,7 +260,7 @@ export default function CartPage({ onPageChange }: CartPageProps) {
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-md p-6 sticky top-8">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h3>
-              
+
               {/* Price Breakdown */}
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between text-gray-600">
@@ -305,7 +328,7 @@ export default function CartPage({ onPageChange }: CartPageProps) {
                       <div className="text-sm text-gray-600">₹50 delivery fee</div>
                     </div>
                   </label>
-                  
+
                   <label className="flex items-center p-3 border border-gray-200 rounded-md cursor-pointer hover:bg-gray-50">
                     <input
                       type="radio"
@@ -328,13 +351,47 @@ export default function CartPage({ onPageChange }: CartPageProps) {
               {deliveryType === 'delivery' && (
                 <div className="mb-6">
                   <h4 className="font-medium text-gray-900 mb-3">Delivery Address</h4>
-                  <textarea
-                    rows={3}
-                    placeholder="Enter your complete delivery address *"
-                    value={deliveryAddress}
-                    onChange={(e) => setDeliveryAddress(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
+                  <div className="space-y-3">
+                    <input
+                      type="text"
+                      placeholder="Street Address *"
+                      value={addressForm.street}
+                      onChange={(e) => setAddressForm({ ...addressForm, street: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <div className="grid grid-cols-2 gap-3">
+                      <input
+                        type="text"
+                        placeholder="City *"
+                        value={addressForm.city}
+                        onChange={(e) => setAddressForm({ ...addressForm, city: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                      <input
+                        type="text"
+                        placeholder="State *"
+                        value={addressForm.state}
+                        onChange={(e) => setAddressForm({ ...addressForm, state: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <input
+                        type="text"
+                        placeholder="Zip Code *"
+                        value={addressForm.zipCode}
+                        onChange={(e) => setAddressForm({ ...addressForm, zipCode: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                      <input
+                        type="text"
+                        placeholder="Country"
+                        value={addressForm.country}
+                        onChange={(e) => setAddressForm({ ...addressForm, country: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                  </div>
                 </div>
               )}
 

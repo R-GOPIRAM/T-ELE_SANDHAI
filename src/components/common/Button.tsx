@@ -1,14 +1,14 @@
 import React from 'react';
-import { Divide as LucideIcon } from 'lucide-react';
+
 
 interface ButtonProps {
   children: React.ReactNode;
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   variant?: 'primary' | 'secondary' | 'outline' | 'danger' | 'success';
   size?: 'sm' | 'md' | 'lg';
   disabled?: boolean;
   loading?: boolean;
-  icon?: LucideIcon;
+  icon?: React.ElementType;
   type?: 'button' | 'submit' | 'reset';
   className?: string;
 }
@@ -24,20 +24,20 @@ export default function Button({
   type = 'button',
   className = ''
 }: ButtonProps) {
-  const baseClasses = 'inline-flex items-center justify-center font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
-  
+  const baseClasses = 'inline-flex items-center justify-center font-semibold rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 active:shadow-sm';
+
   const variants = {
-    primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500',
-    secondary: 'bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-500',
-    outline: 'border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 focus:ring-blue-500',
-    danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
-    success: 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500'
+    primary: 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 focus:ring-blue-500 shadow-sm',
+    secondary: 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700 focus:ring-indigo-500 shadow-sm',
+    outline: 'border-2 border-gray-200 text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-300 focus:ring-blue-500',
+    danger: 'bg-gradient-to-r from-red-500 to-rose-600 text-white hover:from-red-600 hover:to-rose-700 focus:ring-red-500 shadow-sm',
+    success: 'bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700 focus:ring-green-500 shadow-sm'
   };
-  
+
   const sizes = {
-    sm: 'px-3 py-2 text-sm',
-    md: 'px-4 py-2 text-sm',
-    lg: 'px-6 py-3 text-base'
+    sm: 'px-4 py-2 text-sm',
+    md: 'px-6 py-2.5 text-sm',
+    lg: 'px-8 py-3.5 text-base'
   };
 
   const classes = `${baseClasses} ${variants[variant]} ${sizes[size]} ${className}`;

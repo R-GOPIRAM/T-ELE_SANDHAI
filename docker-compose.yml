@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  # 1. High-Performance Static React Web Server (Port 80)
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: always
+
+  # 2. Dedicated Express API Cluster (Port 5000)
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+      - MONGODB_URI=mongodb://mongo:27017/telesandhai
+      - JWT_SECRET=your_jwt_secret_change_me_in_prod
+      - JWT_EXPIRE=90d
+      - CORS_ORIGIN=http://localhost
+    depends_on:
+      - mongo
+    restart: always
+
+  # 3. Persistent Storage Engine
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    restart: always
+
+volumes:
+  mongo-data:

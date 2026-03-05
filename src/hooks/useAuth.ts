@@ -1,90 +1,27 @@
-import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
-import { User } from '../types';
-
-interface AuthContextType {
-  user: User | null;
-  login: (email: string, password: string, role?: string) => Promise<void>;
-  register: (userData: any) => Promise<void>;
-  logout: () => void;
-  loading: boolean;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+import { useEffect } from 'react';
+import { useAuthStore } from '../stores/authStore';
 
 export function useAuth() {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-}
+  const store = useAuthStore();
 
-export function useAuthProvider(): AuthContextType {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-
+  // Initialize auth check once on mount (handled by store persistence mostly, 
+  // but good to verify token validity if needed)
   useEffect(() => {
-    // Check for stored user data on component mount
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    setLoading(false);
+    // Optional: You could trigger a re-validation here if needed
+    // store.checkAuth(); 
   }, []);
 
-  const login = async (email: string, password: string, role?: string) => {
-    setLoading(true);
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const mockUser: User = {
-        id: Math.random().toString(36).substr(2, 9),
-        email,
-        name: email.split('@')[0],
-        role: (role as User['role']) || 'customer'
-      };
-      
-      setUser(mockUser);
-      localStorage.setItem('user', JSON.stringify(mockUser));
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const register = async (userData: any) => {
-    setLoading(true);
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      const newUser: User = {
-        id: Math.random().toString(36).substr(2, 9),
-        email: userData.email,
-        name: userData.name,
-        role: userData.role || 'customer',
-        ...userData
-      };
-      
-      setUser(newUser);
-      localStorage.setItem('user', JSON.stringify(newUser));
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('user');
-  };
-
   return {
-    user,
-    login,
-    register,
-    logout,
-    loading
+    user: store.user,
+    login: store.login,
+    register: store.register,
+    logout: store.logout,
+    loading: store.isLoading,
+    error: store.error,
+    isAuthenticated: !!store.user,
   };
 }
 
-export { AuthContext };
+// Kept for compatibility if used elsewhere, but effectively no-op or returns store
+export const AuthContext = null;
+export const useAuthProvider = () => useAuth();

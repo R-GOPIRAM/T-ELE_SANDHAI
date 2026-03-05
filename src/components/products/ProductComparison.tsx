@@ -1,20 +1,15 @@
-import React from 'react';
+
 import { X, Star, MapPin, ShoppingCart, CheckCircle } from 'lucide-react';
-import { mockProducts } from '../../data/mockData';
 import { Product } from '../../types';
 import Button from '../common/Button';
 
 interface ProductComparisonProps {
-  productIds: string[];
+  products: Product[];
   onClose: () => void;
   onAddToCart: (product: Product) => void;
 }
 
-export default function ProductComparison({ productIds, onClose, onAddToCart }: ProductComparisonProps) {
-  const products = productIds.map(id => 
-    mockProducts.find(p => p.id === id)
-  ).filter(Boolean) as Product[];
-
+export default function ProductComparison({ products, onClose, onAddToCart }: ProductComparisonProps) {
   if (products.length === 0) return null;
 
   const allFeatures = Array.from(new Set(products.flatMap(p => p.features)));
@@ -33,7 +28,7 @@ export default function ProductComparison({ productIds, onClose, onAddToCart }: 
           <X className="w-5 h-5" />
         </button>
       </div>
-      
+
       <div className="overflow-x-auto">
         <table className="min-w-full">
           <thead className="bg-gray-50">
@@ -58,7 +53,7 @@ export default function ProductComparison({ productIds, onClose, onAddToCart }: 
               ))}
             </tr>
           </thead>
-          
+
           <tbody className="divide-y divide-gray-200">
             {/* Price */}
             <tr>
@@ -76,7 +71,7 @@ export default function ProductComparison({ productIds, onClose, onAddToCart }: 
                 </td>
               ))}
             </tr>
-            
+
             {/* Rating */}
             <tr className="bg-gray-50">
               <td className="px-4 py-3 text-sm font-medium text-gray-900">Rating</td>
@@ -92,7 +87,7 @@ export default function ProductComparison({ productIds, onClose, onAddToCart }: 
                 </td>
               ))}
             </tr>
-            
+
             {/* Seller */}
             <tr>
               <td className="px-4 py-3 text-sm font-medium text-gray-900">Seller</td>
@@ -106,19 +101,18 @@ export default function ProductComparison({ productIds, onClose, onAddToCart }: 
                 </td>
               ))}
             </tr>
-            
+
             {/* Availability */}
             <tr className="bg-gray-50">
               <td className="px-4 py-3 text-sm font-medium text-gray-900">Stock</td>
               {products.map(product => (
                 <td key={product.id} className="px-4 py-3 text-center">
-                  <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs ${
-                    product.stock > 10 
-                      ? 'bg-green-100 text-green-800' 
-                      : product.stock > 0 
+                  <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs ${product.stock > 10
+                    ? 'bg-green-100 text-green-800'
+                    : product.stock > 0
                       ? 'bg-yellow-100 text-yellow-800'
                       : 'bg-red-100 text-red-800'
-                  }`}>
+                    }`}>
                     {product.stock > 10 ? 'In Stock' : product.stock > 0 ? 'Low Stock' : 'Out of Stock'}
                   </div>
                   <div className="text-xs text-gray-500 mt-1">
@@ -127,7 +121,7 @@ export default function ProductComparison({ productIds, onClose, onAddToCart }: 
                 </td>
               ))}
             </tr>
-            
+
             {/* Specifications */}
             {allSpecs.map(spec => (
               <tr key={spec} className={allSpecs.indexOf(spec) % 2 === 0 ? 'bg-gray-50' : ''}>
@@ -139,7 +133,7 @@ export default function ProductComparison({ productIds, onClose, onAddToCart }: 
                 ))}
               </tr>
             ))}
-            
+
             {/* Features */}
             <tr className={allSpecs.length % 2 === 0 ? 'bg-gray-50' : ''}>
               <td className="px-4 py-3 text-sm font-medium text-gray-900">Key Features</td>
@@ -162,7 +156,7 @@ export default function ProductComparison({ productIds, onClose, onAddToCart }: 
                 </td>
               ))}
             </tr>
-            
+
             {/* Actions */}
             <tr>
               <td className="px-4 py-4 text-sm font-medium text-gray-900">Actions</td>
