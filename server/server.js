@@ -9,6 +9,7 @@ const cors = require('cors');
 const path = require('path');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
+const mongoSanitize = require('express-mongo-sanitize');
 require('dotenv').config();
 const { validateEnv } = require('./config/config');
 
@@ -43,6 +44,9 @@ app.use('/api/auth', authLimiter); // Stricter limit for auth routes
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(cookieParser());
+
+// Data sanitization against NoSQL query injection
+app.use(mongoSanitize);
 
 // Logger Middleware
 app.use(loggerMiddleware);

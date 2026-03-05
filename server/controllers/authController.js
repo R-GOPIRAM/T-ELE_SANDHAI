@@ -56,6 +56,8 @@ exports.logout = catchAsync(async (req, res) => {
     const cookieOptions = {
         httpOnly: true,
         expires: new Date(Date.now() + 10 * 1000),
+        sameSite: 'strict',
+        secure: process.env.NODE_ENV === 'production',
     };
 
     res.cookie('token', 'none', cookieOptions);
