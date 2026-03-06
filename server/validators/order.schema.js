@@ -29,7 +29,27 @@ const createPaymentSchema = z.object({
     }),
 });
 
+const verifyPaymentSchema = z.object({
+    body: z.object({
+        paymentId: z.string().min(1, 'Payment ID is required'),
+        signature: z.string().min(1, 'Signature is required'),
+    }),
+});
+
+const updatePaymentStatusSchema = z.object({
+    body: z.object({
+        status: z.enum(['pending', 'captured', 'failed', 'refunded']),
+        method: z.enum(['card', 'upi', 'cod', 'netbanking', 'wallet']),
+        transactionId: z.string().optional(),
+    }),
+    params: z.object({
+        id: z.string().min(1, 'Order ID is required'),
+    }),
+});
+
 module.exports = {
     createOrderSchema,
-    createPaymentSchema
+    createPaymentSchema,
+    verifyPaymentSchema,
+    updatePaymentStatusSchema
 };

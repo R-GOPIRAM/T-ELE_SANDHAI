@@ -1,14 +1,16 @@
 const express = require('express');
 const paymentController = require('../controllers/paymentController');
 const { protect } = require('../middleware/authMiddleware');
+const validate = require('../middleware/validateResource');
+const { createOrderSchema, verifyPaymentSchema } = require('../validators/payment.schema');
 
 const router = express.Router();
 
 // 1. Generate a Razorpay Order ID for a given amount
-router.post('/create-order', protect, paymentController.createOrder);
+router.post('/create-order', protect, validate(createOrderSchema), paymentController.createOrder);
 
 // 2. Cryptographically verify the payment signature and save the order
-router.post('/verify', protect, paymentController.verifyPayment);
+router.post('/verify', protect, validate(verifyPaymentSchema), paymentController.verifyPayment);
 
 // 3. Razorpay Webhook Handler (Public & Secure)
 const { validateWebhookSignature } = require('../middleware/razorpayMiddleware');

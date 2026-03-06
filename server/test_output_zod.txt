@@ -1,0 +1,354 @@
+
+> test
+> cross-env NODE_ENV=test jest --runInBand
+
+  console.log
+    [dotenv@17.2.3] injecting env (11) from .env -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+
+      at _log (../node_modules/dotenv/lib/main.js:142:11)
+
+(node:22036) [MONGODB DRIVER] Warning: useNewUrlParser is a deprecated option: useNewUrlParser has no effect since Node.js Driver version 4.0.0 and will be removed in the next major version
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:22036) [MONGODB DRIVER] Warning: useUnifiedTopology is a deprecated option: useUnifiedTopology has no effect since Node.js Driver version 4.0.0 and will be removed in the next major version
+FAIL tests/auth.test.js (245.217 s)
+  Auth Endpoints
+    POST /api/auth/signup
+      × should correctly register a new customer (60091 ms)
+      × should fail with an insecure small password (60015 ms)
+    POST /api/auth/login
+      × should login an existing user (60016 ms)
+      × should fail on missing email or incorrect password (60011 ms)
+
+  ● Auth Endpoints › POST /api/auth/signup › should correctly register a new customer
+
+    thrown: "Exceeded timeout of 60000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+    [0m [90m 11 |[39m
+     [90m 12 |[39m     describe([32m'POST /api/auth/signup'[39m[33m,[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 13 |[39m         it([32m'should correctly register a new customer'[39m[33m,[39m [36masync[39m () [33m=>[39m {
+     [90m    |[39m         [31m[1m^[22m[39m
+     [90m 14 |[39m             [36mconst[39m res [33m=[39m [36mawait[39m request(app)
+     [90m 15 |[39m                 [33m.[39mpost([32m'/api/auth/signup'[39m)
+     [90m 16 |[39m                 [33m.[39msend({[0m
+
+      at it (tests/auth.test.js:13:9)
+      at describe (tests/auth.test.js:12:5)
+      at Object.describe (tests/auth.test.js:10:1)
+
+  ● Auth Endpoints › POST /api/auth/signup › should fail with an insecure small password
+
+    thrown: "Exceeded timeout of 60000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+    [0m [90m 32 |[39m         })[33m;[39m
+     [90m 33 |[39m
+    [31m[1m>[22m[39m[90m 34 |[39m         it([32m'should fail with an insecure small password'[39m[33m,[39m [36masync[39m () [33m=>[39m {
+     [90m    |[39m         [31m[1m^[22m[39m
+     [90m 35 |[39m             [36mconst[39m res [33m=[39m [36mawait[39m request(app)
+     [90m 36 |[39m                 [33m.[39mpost([32m'/api/auth/signup'[39m)
+     [90m 37 |[39m                 [33m.[39msend({[0m
+
+      at it (tests/auth.test.js:34:9)
+      at describe (tests/auth.test.js:12:5)
+      at Object.describe (tests/auth.test.js:10:1)
+
+  ● Auth Endpoints › POST /api/auth/login › should login an existing user
+
+    thrown: "Exceeded timeout of 60000 ms for a hook.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+    [0m [90m 48 |[39m
+     [90m 49 |[39m     describe([32m'POST /api/auth/login'[39m[33m,[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 50 |[39m         beforeEach([36masync[39m () [33m=>[39m {
+     [90m    |[39m         [31m[1m^[22m[39m
+     [90m 51 |[39m             [90m// Seed a user before these login tests[39m
+     [90m 52 |[39m             [36mawait[39m request(app)[33m.[39mpost([32m'/api/auth/signup'[39m)[33m.[39msend({
+     [90m 53 |[39m                 name[33m:[39m [32m'Login User'[39m[33m,[39m[0m
+
+      at beforeEach (tests/auth.test.js:50:9)
+      at describe (tests/auth.test.js:49:5)
+      at Object.describe (tests/auth.test.js:10:1)
+
+  ● Auth Endpoints › POST /api/auth/login › should fail on missing email or incorrect password
+
+    thrown: "Exceeded timeout of 60000 ms for a hook.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+    [0m [90m 48 |[39m
+     [90m 49 |[39m     describe([32m'POST /api/auth/login'[39m[33m,[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 50 |[39m         beforeEach([36masync[39m () [33m=>[39m {
+     [90m    |[39m         [31m[1m^[22m[39m
+     [90m 51 |[39m             [90m// Seed a user before these login tests[39m
+     [90m 52 |[39m             [36mawait[39m request(app)[33m.[39mpost([32m'/api/auth/signup'[39m)[33m.[39msend({
+     [90m 53 |[39m                 name[33m:[39m [32m'Login User'[39m[33m,[39m[0m
+
+      at beforeEach (tests/auth.test.js:50:9)
+      at describe (tests/auth.test.js:49:5)
+      at Object.describe (tests/auth.test.js:10:1)
+
+  console.log
+    [dotenv@17.2.3] injecting env (11) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+
+      at _log (../node_modules/dotenv/lib/main.js:142:11)
+
+(node:22036) [MONGODB DRIVER] Warning: useNewUrlParser is a deprecated option: useNewUrlParser has no effect since Node.js Driver version 4.0.0 and will be removed in the next major version
+(node:22036) [MONGODB DRIVER] Warning: useUnifiedTopology is a deprecated option: useUnifiedTopology has no effect since Node.js Driver version 4.0.0 and will be removed in the next major version
+FAIL tests/product.test.js (182.463 s)
+  Product Endpoints
+    GET /api/products
+      × should get an empty array when no products exist (60046 ms)
+    POST /api/products
+      × should allow a seller to create a product (60054 ms)
+      × should reject unauthorized customer creation attempts (60017 ms)
+
+  ● Product Endpoints › GET /api/products › should get an empty array when no products exist
+
+    thrown: "Exceeded timeout of 60000 ms for a hook.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+    [0m [90m 12 |[39m     [36mlet[39m sellerId[33m;[39m
+     [90m 13 |[39m
+    [31m[1m>[22m[39m[90m 14 |[39m     beforeEach([36masync[39m () [33m=>[39m {
+     [90m    |[39m     [31m[1m^[22m[39m
+     [90m 15 |[39m         [90m// Register and login a seller to get a token[39m
+     [90m 16 |[39m         [36mconst[39m res [33m=[39m [36mawait[39m request(app)[33m.[39mpost([32m'/api/auth/signup'[39m)[33m.[39msend({
+     [90m 17 |[39m             name[33m:[39m [32m'Test Seller'[39m[33m,[39m[0m
+
+      at beforeEach (tests/product.test.js:14:5)
+      at Object.describe (tests/product.test.js:10:1)
+
+  ● Product Endpoints › POST /api/products › should allow a seller to create a product
+
+    thrown: "Exceeded timeout of 60000 ms for a hook.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+    [0m [90m 12 |[39m     [36mlet[39m sellerId[33m;[39m
+     [90m 13 |[39m
+    [31m[1m>[22m[39m[90m 14 |[39m     beforeEach([36masync[39m () [33m=>[39m {
+     [90m    |[39m     [31m[1m^[22m[39m
+     [90m 15 |[39m         [90m// Register and login a seller to get a token[39m
+     [90m 16 |[39m         [36mconst[39m res [33m=[39m [36mawait[39m request(app)[33m.[39mpost([32m'/api/auth/signup'[39m)[33m.[39msend({
+     [90m 17 |[39m             name[33m:[39m [32m'Test Seller'[39m[33m,[39m[0m
+
+      at beforeEach (tests/product.test.js:14:5)
+      at Object.describe (tests/product.test.js:10:1)
+
+  ● Product Endpoints › POST /api/products › should reject unauthorized customer creation attempts
+
+    thrown: "Exceeded timeout of 60000 ms for a hook.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+    [0m [90m 12 |[39m     [36mlet[39m sellerId[33m;[39m
+     [90m 13 |[39m
+    [31m[1m>[22m[39m[90m 14 |[39m     beforeEach([36masync[39m () [33m=>[39m {
+     [90m    |[39m     [31m[1m^[22m[39m
+     [90m 15 |[39m         [90m// Register and login a seller to get a token[39m
+     [90m 16 |[39m         [36mconst[39m res [33m=[39m [36mawait[39m request(app)[33m.[39mpost([32m'/api/auth/signup'[39m)[33m.[39msend({
+     [90m 17 |[39m             name[33m:[39m [32m'Test Seller'[39m[33m,[39m[0m
+
+      at beforeEach (tests/product.test.js:14:5)
+      at Object.describe (tests/product.test.js:10:1)
+
+  console.log
+    [dotenv@17.2.3] injecting env (11) from .env -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+
+      at _log (../node_modules/dotenv/lib/main.js:142:11)
+
+(node:22036) [MONGODB DRIVER] Warning: useNewUrlParser is a deprecated option: useNewUrlParser has no effect since Node.js Driver version 4.0.0 and will be removed in the next major version
+(node:22036) [MONGODB DRIVER] Warning: useUnifiedTopology is a deprecated option: useUnifiedTopology has no effect since Node.js Driver version 4.0.0 and will be removed in the next major version
+FAIL tests/authRotation.test.js (185.113 s)
+  Auth Token Rotation and Secure Cookies
+    × should set httpOnly cookies on login (60024 ms)
+    × should rotate refresh token on /auth/refresh (60017 ms)
+    × should fail if refresh token is missing or invalid (60023 ms)
+
+  ● Auth Token Rotation and Secure Cookies › should set httpOnly cookies on login
+
+    thrown: "Exceeded timeout of 60000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+    [0m [90m 16 |[39m     }[33m;[39m
+     [90m 17 |[39m
+    [31m[1m>[22m[39m[90m 18 |[39m     it([32m'should set httpOnly cookies on login'[39m[33m,[39m [36masync[39m () [33m=>[39m {
+     [90m    |[39m     [31m[1m^[22m[39m
+     [90m 19 |[39m         [36mawait[39m request(app)[33m.[39mpost([32m'/api/auth/signup'[39m)[33m.[39msend(userData)[33m;[39m
+     [90m 20 |[39m
+     [90m 21 |[39m         [36mconst[39m res [33m=[39m [36mawait[39m request(app)[0m
+
+      at it (tests/authRotation.test.js:18:5)
+      at Object.describe (tests/authRotation.test.js:10:1)
+
+  ● Auth Token Rotation and Secure Cookies › should rotate refresh token on /auth/refresh
+
+    thrown: "Exceeded timeout of 60000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+    [0m [90m 38 |[39m     })[33m;[39m
+     [90m 39 |[39m
+    [31m[1m>[22m[39m[90m 40 |[39m     it([32m'should rotate refresh token on /auth/refresh'[39m[33m,[39m [36masync[39m () [33m=>[39m {
+     [90m    |[39m     [31m[1m^[22m[39m
+     [90m 41 |[39m         [36mawait[39m request(app)[33m.[39mpost([32m'/api/auth/signup'[39m)[33m.[39msend(userData)[33m;[39m
+     [90m 42 |[39m
+     [90m 43 |[39m         [36mconst[39m loginRes [33m=[39m [36mawait[39m request(app)[0m
+
+      at it (tests/authRotation.test.js:40:5)
+      at Object.describe (tests/authRotation.test.js:10:1)
+
+  ● Auth Token Rotation and Secure Cookies › should fail if refresh token is missing or invalid
+
+    thrown: "Exceeded timeout of 60000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+    [0m [90m 82 |[39m     })[33m;[39m
+     [90m 83 |[39m
+    [31m[1m>[22m[39m[90m 84 |[39m     it([32m'should fail if refresh token is missing or invalid'[39m[33m,[39m [36masync[39m () [33m=>[39m {
+     [90m    |[39m     [31m[1m^[22m[39m
+     [90m 85 |[39m         [36mconst[39m res [33m=[39m [36mawait[39m request(app)[33m.[39mpost([32m'/api/auth/refresh'[39m)[33m;[39m
+     [90m 86 |[39m         expect(res[33m.[39mstatusCode)[33m.[39mtoEqual([35m401[39m)[33m;[39m
+     [90m 87 |[39m         expect(res[33m.[39mbody[33m.[39mmessage)[33m.[39mtoContain([32m'required'[39m)[33m;[39m[0m
+
+      at it (tests/authRotation.test.js:84:5)
+      at Object.describe (tests/authRotation.test.js:10:1)
+
+  console.log
+    [dotenv@17.2.3] injecting env (11) from .env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+
+      at _log (../node_modules/dotenv/lib/main.js:142:11)
+
+(node:22036) [MONGODB DRIVER] Warning: useNewUrlParser is a deprecated option: useNewUrlParser has no effect since Node.js Driver version 4.0.0 and will be removed in the next major version
+(node:22036) [MONGODB DRIVER] Warning: useUnifiedTopology is a deprecated option: useUnifiedTopology has no effect since Node.js Driver version 4.0.0 and will be removed in the next major version
+FAIL tests/mongoSanitize.test.js (121.412 s)
+  MongoDB Injection Protection
+    × should sanitize request body by removing keys starting with $ (60001 ms)
+    × should sanitize query parameters (60008 ms)
+
+  ● MongoDB Injection Protection › should sanitize request body by removing keys starting with $
+
+    thrown: "Exceeded timeout of 60000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+    [0m [90m  7 |[39m
+     [90m  8 |[39m describe([32m'MongoDB Injection Protection'[39m[33m,[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m  9 |[39m     it([32m'should sanitize request body by removing keys starting with $'[39m[33m,[39m [36masync[39m () [33m=>[39m {
+     [90m    |[39m     [31m[1m^[22m[39m
+     [90m 10 |[39m         [90m// We can use any endpoint that accepts a body, e.g., /api/auth/login[39m
+     [90m 11 |[39m         [36mconst[39m res [33m=[39m [36mawait[39m request(app)
+     [90m 12 |[39m             [33m.[39mpost([32m'/api/auth/login'[39m)[0m
+
+      at it (tests/mongoSanitize.test.js:9:5)
+      at Object.describe (tests/mongoSanitize.test.js:8:1)
+
+  ● MongoDB Injection Protection › should sanitize query parameters
+
+    thrown: "Exceeded timeout of 60000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+    [0m [90m 27 |[39m     })[33m;[39m
+     [90m 28 |[39m
+    [31m[1m>[22m[39m[90m 29 |[39m     it([32m'should sanitize query parameters'[39m[33m,[39m [36masync[39m () [33m=>[39m {
+     [90m    |[39m     [31m[1m^[22m[39m
+     [90m 30 |[39m         [36mconst[39m res [33m=[39m [36mawait[39m request(app)
+     [90m 31 |[39m             [33m.[39m[36mget[39m([32m'/api/products?price[$gt]=0'[39m)[33m;[39m [90m// Malicious query attempt[39m
+     [90m 32 |[39m[0m
+
+      at it (tests/mongoSanitize.test.js:29:5)
+      at Object.describe (tests/mongoSanitize.test.js:8:1)
+
+  console.log
+    [dotenv@17.2.3] injecting env (11) from .env -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+
+      at _log (../node_modules/dotenv/lib/main.js:142:11)
+
+(node:22036) [MONGODB DRIVER] Warning: useNewUrlParser is a deprecated option: useNewUrlParser has no effect since Node.js Driver version 4.0.0 and will be removed in the next major version
+(node:22036) [MONGODB DRIVER] Warning: useUnifiedTopology is a deprecated option: useUnifiedTopology has no effect since Node.js Driver version 4.0.0 and will be removed in the next major version
+FAIL tests/order.test.js (121.46 s)
+  Order & Bargain Endpoints
+    Bargain Logic
+      × should create a bargain request for a product (60084 ms)
+    POST /api/orders
+      × should successfully place an order and deduct stock (60017 ms)
+
+  ● Order & Bargain Endpoints › Bargain Logic › should create a bargain request for a product
+
+    thrown: "Exceeded timeout of 60000 ms for a hook.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+    [0m [90m 13 |[39m     [36mlet[39m productId[33m;[39m
+     [90m 14 |[39m
+    [31m[1m>[22m[39m[90m 15 |[39m     beforeEach([36masync[39m () [33m=>[39m {
+     [90m    |[39m     [31m[1m^[22m[39m
+     [90m 16 |[39m         [90m// 1. Register Seller[39m
+     [90m 17 |[39m         [36mconst[39m sellerRes [33m=[39m [36mawait[39m request(app)[33m.[39mpost([32m'/api/auth/signup'[39m)[33m.[39msend({
+     [90m 18 |[39m             name[33m:[39m [32m'Order Seller'[39m[33m,[39m email[33m:[39m [32m'orderseller@test.com'[39m[33m,[39m password[33m:[39m [32m'password123'[39m[33m,[39m role[33m:[39m [32m'seller'[39m[0m
+
+      at beforeEach (tests/order.test.js:15:5)
+      at Object.describe (tests/order.test.js:10:1)
+
+  ● Order & Bargain Endpoints › POST /api/orders › should successfully place an order and deduct stock
+
+    thrown: "Exceeded timeout of 60000 ms for a hook.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+    [0m [90m 13 |[39m     [36mlet[39m productId[33m;[39m
+     [90m 14 |[39m
+    [31m[1m>[22m[39m[90m 15 |[39m     beforeEach([36masync[39m () [33m=>[39m {
+     [90m    |[39m     [31m[1m^[22m[39m
+     [90m 16 |[39m         [90m// 1. Register Seller[39m
+     [90m 17 |[39m         [36mconst[39m sellerRes [33m=[39m [36mawait[39m request(app)[33m.[39mpost([32m'/api/auth/signup'[39m)[33m.[39msend({
+     [90m 18 |[39m             name[33m:[39m [32m'Order Seller'[39m[33m,[39m email[33m:[39m [32m'orderseller@test.com'[39m[33m,[39m password[33m:[39m [32m'password123'[39m[33m,[39m role[33m:[39m [32m'seller'[39m[0m
+
+      at beforeEach (tests/order.test.js:15:5)
+      at Object.describe (tests/order.test.js:10:1)
+
+  console.log
+    [dotenv@17.2.3] injecting env (11) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+
+      at _log (../node_modules/dotenv/lib/main.js:142:11)
+
+(node:22036) [MONGODB DRIVER] Warning: useNewUrlParser is a deprecated option: useNewUrlParser has no effect since Node.js Driver version 4.0.0 and will be removed in the next major version
+(node:22036) [MONGODB DRIVER] Warning: useUnifiedTopology is a deprecated option: useUnifiedTopology has no effect since Node.js Driver version 4.0.0 and will be removed in the next major version
+FAIL tests/bargain.test.js (123.806 s)
+  Bargain Endpoints
+    POST /api/bargain/start
+      × should automatically reject an offer drastically below the minimum threshold (60022 ms)
+      × should allow seller to accept an offer above the minimum threshold (60016 ms)
+
+  ● Bargain Endpoints › POST /api/bargain/start › should automatically reject an offer drastically below the minimum threshold
+
+    thrown: "Exceeded timeout of 60000 ms for a hook.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+    [0m [90m 16 |[39m     [36mlet[39m productId[33m;[39m
+     [90m 17 |[39m
+    [31m[1m>[22m[39m[90m 18 |[39m     beforeEach([36masync[39m () [33m=>[39m {
+     [90m    |[39m     [31m[1m^[22m[39m
+     [90m 19 |[39m         [36mconst[39m sellerRes [33m=[39m [36mawait[39m request(app)[33m.[39mpost([32m'/api/auth/signup'[39m)[33m.[39msend({
+     [90m 20 |[39m             name[33m:[39m [32m'B Seller'[39m[33m,[39m email[33m:[39m [32m'bseller@test.com'[39m[33m,[39m password[33m:[39m [32m'password123'[39m[33m,[39m role[33m:[39m [32m'seller'[39m
+     [90m 21 |[39m         })[33m;[39m[0m
+
+      at beforeEach (tests/bargain.test.js:18:5)
+      at Object.describe (tests/bargain.test.js:11:1)
+
+  ● Bargain Endpoints › POST /api/bargain/start › should allow seller to accept an offer above the minimum threshold
+
+    thrown: "Exceeded timeout of 60000 ms for a hook.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+    [0m [90m 16 |[39m     [36mlet[39m productId[33m;[39m
+     [90m 17 |[39m
+    [31m[1m>[22m[39m[90m 18 |[39m     beforeEach([36masync[39m () [33m=>[39m {
+     [90m    |[39m     [31m[1m^[22m[39m
+     [90m 19 |[39m         [36mconst[39m sellerRes [33m=[39m [36mawait[39m request(app)[33m.[39mpost([32m'/api/auth/signup'[39m)[33m.[39msend({
+     [90m 20 |[39m             name[33m:[39m [32m'B Seller'[39m[33m,[39m email[33m:[39m [32m'bseller@test.com'[39m[33m,[39m password[33m:[39m [32m'password123'[39m[33m,[39m role[33m:[39m [32m'seller'[39m
+     [90m 21 |[39m         })[33m;[39m[0m
+
+      at beforeEach (tests/bargain.test.js:18:5)
+      at Object.describe (tests/bargain.test.js:11:1)
+
+Test Suites: 6 failed, 6 total
+Tests:       16 failed, 16 total
+Snapshots:   0 total
+Time:        979.758 s
+Ran all test suites.
+Force exiting Jest: Have you considered using `--detectOpenHandles` to detect async operations that kept running after all tests finished?

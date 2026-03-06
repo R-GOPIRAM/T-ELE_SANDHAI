@@ -16,7 +16,22 @@ const loginSchema = z.object({
     }),
 });
 
+const updateProfileSchema = z.object({
+    body: z.object({
+        name: z.string().min(2, 'Name must be at least 2 characters').optional(),
+        phone: z.string().optional(),
+        address: z.object({
+            street: z.string().optional(),
+            city: z.string().optional(),
+            state: z.string().optional(),
+            zipCode: z.string().optional(),
+            country: z.string().optional(),
+        }).optional(),
+    }),
+});
+
 module.exports = {
     registerSchema,
     loginSchema,
+    updateProfileSchema,
 };

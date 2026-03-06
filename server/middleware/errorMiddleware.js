@@ -36,7 +36,7 @@ const sendErrorDev = (err, res) => {
     });
 };
 
-const sendErrorProd = (err, res) => {
+const sendErrorProd = (err, req, res) => {
     // Operational, trusted error: send message to client
     if (err.isOperational) {
         res.status(err.statusCode).json({
@@ -47,11 +47,14 @@ const sendErrorProd = (err, res) => {
     }
     // Programming or other unknown error: don't leak error details
     else {
-        // 1) Log error explicitly with stack trace for Winston JSON
-        logger.error(`[UNHANDLED EXCEPTION] 💥 ${err.message}`, {
+        // 1) Log error explicitly with stack trace for Winston
+        logger.error(`[UNHANDLED SERVER ERROR] 💥 ${err.message}`, {
             errorName: err.name,
             stack: err.stack,
-            isOperational: err.isOperational
+            path: req.originalUrl,
+            userId: req.user ? req.user.id : 'unauthenticated',
+            method: req.method,
+            ip: req.ip
         });
 
         // 2) Send generic message
@@ -87,6 +90,6 @@ module.exports = (err, req, res, next) => {
         if (error.name === 'JsonWebTokenError') error = handleJWTError();
         if (error.name === 'TokenExpiredError') error = handleJWTExpiredError();
 
-        sendErrorProd(error, res);
+        sendErrorProd(error, req, res);
     }
 };

@@ -31,7 +31,24 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 // Security Middleware
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    useDefaults: true,
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://checkout.razorpay.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      imgSrc: ["'self'", "data:", "blob:", "https://res.cloudinary.com"], // Add any external image CDNs here if needed
+      connectSrc: ["'self'", "https://api.razorpay.com"],
+      frameSrc: ["'self'", "https://checkout.razorpay.com"]
+    },
+  },
+  xssFilter: true, // Enables X-XSS-Protection
+  frameguard: {
+    action: 'deny' // Strictly prevents clickjacking by denying all framing
+  }
+}));
 const corsOptions = require('./config/cors');
 app.use(cors(corsOptions));
 

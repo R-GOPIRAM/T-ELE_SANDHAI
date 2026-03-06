@@ -1,0 +1,5 @@
+
+> test
+> cross-env NODE_ENV=test jest --runInBand tests/auth.test.js tests/order.test.js tests/seller.test.js tests/review.test.js tests/product.test.js
+
+Terminate batch job (Y/N)? Terminate batch job (Y/N)? 
