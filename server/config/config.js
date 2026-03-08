@@ -11,6 +11,9 @@ const validateEnv = () => {
     const missingEnv = requiredEnv.filter(env => !process.env[env]);
 
     if (missingEnv.length > 0) {
+        if (process.env.NODE_ENV === 'test') {
+            return; // Skip strict check in tests
+        }
         console.error('\x1b[31m%s\x1b[0m', 'CRITICAL ERROR: Missing required environment variables:');
         missingEnv.forEach(env => {
             console.error('\x1b[31m%s\x1b[0m', ` - ${env}`);

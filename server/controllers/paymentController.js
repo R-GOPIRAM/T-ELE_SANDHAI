@@ -65,5 +65,5 @@ exports.handleWebhook = catchAsync(async (req, res, next) => {
     });
 
     // Always respond with 200 OK to Razorpay to prevent retries
-    return res.status(200).json({ status: 'ok' });
+    return sendResponse(res, 200, true, 'Webhook received');
 });

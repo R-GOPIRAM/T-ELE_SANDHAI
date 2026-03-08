@@ -17,9 +17,13 @@ class SellerRepository {
         return await Seller.create(sellerData);
     }
 
+    async update(id, sellerData) {
+        return await Seller.findByIdAndUpdate(id, sellerData, { new: true, runValidators: true });
+    }
+
     async updateVerificationStatus(id, status, reason = null) {
         const update = {
-            verificationStatus: status,
+            sellerStatus: status,
             [(status === 'approved' ? 'approvedAt' : 'rejectedAt')]: new Date()
         };
 

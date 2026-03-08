@@ -13,11 +13,14 @@ exports.getMyOrders = catchAsync(async (req, res) => {
     const limit = parseInt(req.query.limit, 10) || 10;
     const result = await OrderService.getUserOrders(req.user._id, page, limit);
 
-    return sendResponse(res, 200, true, 'User orders fetched successfully', result.orders, null, {
-        count: result.orders.length,
-        total: result.total,
-        page,
-        totalPages: Math.ceil(result.total / limit)
+    return sendResponse(res, 200, true, 'User orders fetched successfully', {
+        orders: result.orders,
+        pagination: {
+            count: result.orders.length,
+            total: result.total,
+            page,
+            totalPages: Math.ceil(result.total / limit)
+        }
     });
 });
 
@@ -31,11 +34,14 @@ exports.getSellerOrders = catchAsync(async (req, res) => {
     const limit = parseInt(req.query.limit, 10) || 10;
     const result = await OrderService.getSellerOrders(req.user._id, page, limit);
 
-    return sendResponse(res, 200, true, 'Seller orders fetched successfully', result.orders, null, {
-        count: result.orders.length,
-        total: result.total,
-        page,
-        totalPages: Math.ceil(result.total / limit)
+    return sendResponse(res, 200, true, 'Seller orders fetched successfully', {
+        orders: result.orders,
+        pagination: {
+            count: result.orders.length,
+            total: result.total,
+            page,
+            totalPages: Math.ceil(result.total / limit)
+        }
     });
 });
 

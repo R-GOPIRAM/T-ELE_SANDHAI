@@ -5,7 +5,8 @@ const { sendResponse } = require('../utils/response');
 
 exports.getAllSellers = catchAsync(async (req, res) => {
     const sellers = await SellerService.getAllSellers();
-    return sendResponse(res, 200, true, 'Sellers fetched successfully', sellers, null, {
+    return sendResponse(res, 200, true, 'Sellers fetched successfully', {
+        sellers,
         count: sellers.length
     });
 });
@@ -16,18 +17,27 @@ exports.verifySeller = catchAsync(async (req, res) => {
     return sendResponse(res, 200, true, 'Seller verification updated', seller);
 });
 
+exports.getStockAlerts = catchAsync(async (req, res) => {
+    const alerts = await SellerService.getStockAlerts(req.user._id);
+    return sendResponse(res, 200, true, 'Stock alerts fetched successfully', alerts);
+});
+
+exports.markStockAlertRead = catchAsync(async (req, res) => {
+    const alert = await SellerService.markStockAlertRead(req.user._id, req.params.id);
+    return sendResponse(res, 200, true, 'Stock alert marked as read', alert);
+});
+
 exports.register = catchAsync(async (req, res, next) => {
     const { businessName, businessAddress, businessPhone, panNumber, businessCategory, businessDescription } = req.body;
 
-    // Check if seller already exists
+    // Check if seller already exists - If so, we UPDATE it instead of failing
     const existingSeller = await SellerService.getSellerByUserId(req.user._id);
-    if (existingSeller) {
-        return next(new AppError('Seller profile already exists', 409));
-    }
 
     const documents = {
         aadhaar: req.files?.aadhaar?.[0]?.path,
         pan: req.files?.pan?.[0]?.path,
+        gstin: req.files?.gstin?.[0]?.path,
+        laborCert: req.files?.laborCert?.[0]?.path,
         businessLicense: req.files?.businessLicense?.[0]?.path
     };
 
@@ -42,9 +52,15 @@ exports.register = catchAsync(async (req, res, next) => {
         documents
     };
 
-    const seller = await SellerService.createSeller(sellerData);
+    let seller;
+    if (existingSeller) {
+        // Update existing skeleton profile created during registration
+        seller = await SellerService.updateSeller(existingSeller._id, sellerData);
+    } else {
+        seller = await SellerService.createSeller(sellerData);
+    }
 
-    return sendResponse(res, 201, true, 'Seller registration submitted', seller);
+    return sendResponse(res, existingSeller ? 200 : 201, true, 'Seller registration updated', seller);
 });
 
 exports.getProfile = catchAsync(async (req, res, next) => {
@@ -54,4 +70,27 @@ exports.getProfile = catchAsync(async (req, res, next) => {
     }
 
     return sendResponse(res, 200, true, 'Seller profile fetched successfully', seller);
+});
+
+exports.getStoreProfile = catchAsync(async (req, res, next) => {
+    const storeId = req.params.id;
+    const store = await SellerService.getSellerById(storeId);
+
+    if (!store) {
+        return next(new AppError('Store not found', 404));
+    }
+
+    // Only return safe public data for the store profile
+    const publicStoreData = {
+        _id: store._id,
+        businessName: store.businessName,
+        businessAddress: store.businessAddress,
+        businessCategory: store.businessCategory,
+        businessDescription: store.businessDescription,
+        sellerStatus: store.sellerStatus,
+        rating: store.rating || 4.5, // Mock rating if missing
+        joinedAt: store.createdAt
+    };
+
+    return sendResponse(res, 200, true, 'Store profile fetched successfully', publicStoreData);
 });

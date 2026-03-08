@@ -9,17 +9,12 @@
  * @param {any} error - Error details (optional)
  * @param {Object} metadata - Additional metadata like pagination (optional)
  */
-const sendResponse = (res, statusCode, success, message, data = null, error = null, metadata = null) => {
-    const payload = {
+const sendResponse = (res, statusCode, success, message, data = {}) => {
+    return res.status(statusCode).json({
         success,
         message,
-    };
-
-    if (data !== null) payload.data = data;
-    if (error !== null) payload.error = error;
-    if (metadata !== null) Object.assign(payload, metadata);
-
-    return res.status(statusCode).json(payload);
+        data: data || {}
+    });
 };
 
 module.exports = { sendResponse };

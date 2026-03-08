@@ -6,8 +6,13 @@ const socket = require('./socket');
 const PORT = process.env.PORT || 5000;
 const server = http.createServer(app);
 
+const initShipmentSyncJob = require('./jobs/shipmentSyncJob');
+
 // Initialize Socket.io
 socket.init(server);
+
+// Initialize Background Jobs
+initShipmentSyncJob();
 
 server.listen(PORT, () => {
     logger.info(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);

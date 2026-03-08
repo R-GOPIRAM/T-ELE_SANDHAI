@@ -99,7 +99,8 @@ productSchema.index({ name: 'text', category: 'text', description: 'text', brand
 productSchema.index({ price: 1 });
 productSchema.index({ rating: -1 });
 productSchema.index({ createdAt: -1 });
-productSchema.index({ shopOwnerId: 1 });
-productSchema.index({ isAvailable: 1 });
+productSchema.index({ shopOwnerId: 1, isAvailable: 1 }); // For seller dashboard speed
+productSchema.index({ category: 1, isAvailable: 1, stock: -1 }); // For store browsing speed
+productSchema.index({ brand: 1 });
 
 module.exports = mongoose.model('Product', productSchema);

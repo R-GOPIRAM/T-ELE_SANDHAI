@@ -8,10 +8,10 @@ exports.createReview = catchAsync(async (req, res) => {
 });
 
 exports.getProductReviews = catchAsync(async (req, res) => {
-    const data = await ReviewService.getProductReviews(req.params.productId, req.query);
-    const { reviews, ...metadata } = data;
-
-    return sendResponse(res, 200, true, 'Product reviews fetched successfully', reviews, null, metadata);
+    return sendResponse(res, 200, true, 'Product reviews fetched successfully', {
+        reviews,
+        pagination: metadata
+    });
 });
 
 exports.getMyReviews = catchAsync(async (req, res) => {

@@ -58,7 +58,7 @@ class ProductService {
         const filter = { isAvailable: true };
 
         if (category) {
-            filter.category = new RegExp(`^${category}$`, 'i');
+            filter.category = { $regex: new RegExp(`^${category.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') };
         }
 
         if (search) {

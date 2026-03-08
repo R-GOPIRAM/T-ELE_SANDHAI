@@ -11,42 +11,42 @@ const sendTokenResponse = (user, accessToken, refreshToken, res) => {
 
     const accessTokenOptions = {
         ...cookieOptions,
-        expires: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes for access token
+        expires: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes
     };
 
     const refreshTokenOptions = {
         ...cookieOptions,
-        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days for refresh token
+        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
     };
 
     res.cookie('accessToken', accessToken, accessTokenOptions);
     res.cookie('refreshToken', refreshToken, refreshTokenOptions);
 
-    // Also keep 'token' for backward compatibility if needed, or remove it.
-    // Given the prompt "implement proper refresh token storage using httpOnly cookies", 
-    // I'll use explicit names but keep 'token' as an alias for accessToken if helpful for middleware.
-    res.cookie('token', accessToken, accessTokenOptions);
-
-    const payload = {
+    return sendResponse(res, 200, true, 'Authentication successful', {
         user: {
             id: user._id,
             name: user.name,
             email: user.email,
             role: user.role,
-        }
-    };
-
-    return sendResponse(res, 200, true, 'Authentication successful', payload);
+        },
+        accessToken // Include in body for frontend convenience if needed
+    });
 };
 
-exports.register = catchAsync(async (req, res) => {
-    const { user, accessToken, refreshToken } = await AuthService.register(req.body);
+exports.registerCustomer = catchAsync(async (req, res) => {
+    const { user, accessToken, refreshToken } = await AuthService.registerCustomer(req.body);
+    sendTokenResponse(user, accessToken, refreshToken, res);
+});
+
+exports.registerSeller = catchAsync(async (req, res) => {
+    const { user, accessToken, refreshToken } = await AuthService.registerSeller(req.body);
     sendTokenResponse(user, accessToken, refreshToken, res);
 });
 
 exports.login = catchAsync(async (req, res) => {
     const { email, password } = req.body;
-    const { user, accessToken, refreshToken } = await AuthService.login(email, password);
+    const ip = req.ip || req.connection.remoteAddress;
+    const { user, accessToken, refreshToken } = await AuthService.login(email, password, ip);
     sendTokenResponse(user, accessToken, refreshToken, res);
 });
 
@@ -60,9 +60,9 @@ exports.logout = catchAsync(async (req, res) => {
         secure: process.env.NODE_ENV === 'production',
     };
 
-    res.cookie('token', 'none', cookieOptions);
-    res.cookie('accessToken', 'none', cookieOptions);
-    res.cookie('refreshToken', 'none', cookieOptions);
+    res.clearCookie('token', cookieOptions);
+    res.clearCookie('accessToken', cookieOptions);
+    res.clearCookie('refreshToken', cookieOptions);
 
     return sendResponse(res, 200, true, 'Logged out successfully');
 });
@@ -76,18 +76,21 @@ exports.refresh = catchAsync(async (req, res) => {
 });
 
 exports.getMe = catchAsync(async (req, res) => {
-    return sendResponse(res, 200, true, 'User profile fetched successfully', { user: req.user });
+    return sendResponse(res, 200, true, 'User profile fetched successfully', {
+        user: req.user,
+        role: req.user.role
+    });
 });
 
 exports.updateProfile = catchAsync(async (req, res) => {
     const updatedUser = await AuthService.updateProfile(req.user.id, req.body);
-    const userData = {
+    return sendResponse(res, 200, true, 'Profile updated successfully', {
         user: {
             id: updatedUser._id,
             name: updatedUser.name,
             email: updatedUser.email,
             role: updatedUser.role,
-        }
-    };
-    return sendResponse(res, 200, true, 'Profile updated successfully', userData);
+        },
+        role: updatedUser.role
+    });
 });

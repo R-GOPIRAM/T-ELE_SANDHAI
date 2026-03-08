@@ -37,6 +37,10 @@ export interface RegisterData {
   email: string;
   password: string;
   role?: 'customer' | 'seller' | 'admin';
+  businessName?: string;
+  businessAddress?: string;
+  phone?: string;
+  panNumber?: string;
 }
 
 export interface Product {
@@ -104,12 +108,25 @@ export interface OrderItem {
 }
 
 export type NotificationType = 'success' | 'error' | 'warning' | 'info';
+export type NotificationCategory = 'bargain' | 'order' | 'delivery' | 'message' | 'system';
 
 export interface Notification {
   id: string;
   type: NotificationType;
+  category: NotificationCategory;
   title: string;
   message: string;
   timestamp: string;
   isRead: boolean;
+  link?: string;
+}
+
+export interface Location {
+  city: string;
+  area: string;
+  pincode: string;
+  coordinates: {
+    lat: number;
+    lng: number;
+  };
 }

@@ -1,0 +1,27 @@
+
+C:\Users\gopir\Downloads\ibm-project-master\ibm-project-master\project\src\pages\Dashboard\SellerAnalytics.tsx
+  28:53  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\gopir\Downloads\ibm-project-master\ibm-project-master\project\src\pages\Dashboard\SellerDashboard.tsx
+   44:61   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  182:108  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\gopir\Downloads\ibm-project-master\ibm-project-master\project\src\pages\Dashboard\SellerOrdersPage.tsx
+   57:66  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   61:49  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  116:38  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\gopir\Downloads\ibm-project-master\ibm-project-master\project\src\pages\PaymentPage.tsx
+  11:56  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  19:61  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  22:67  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\gopir\Downloads\ibm-project-master\ibm-project-master\project\src\pages\ProductsPage.tsx
+  69:6  warning  React Hook useEffect has a missing dependency: 'fetchProducts'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\gopir\Downloads\ibm-project-master\ibm-project-master\project\src\store\productStore.ts
+  10:44  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  22:50  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 12 problems (11 errors, 1 warning)
+

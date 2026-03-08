@@ -14,6 +14,10 @@ const sellerSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  pincode: String,
+  latitude: Number,
+  longitude: Number,
+  pickupLocationName: String,
   businessPhone: {
     type: String,
     required: true
@@ -27,7 +31,7 @@ const sellerSchema = new mongoose.Schema({
   businessCategory: String,
   businessDescription: String,
   yearsInBusiness: Number,
-  verificationStatus: {
+  sellerStatus: {
     type: String,
     enum: ['pending', 'approved', 'rejected'],
     default: 'pending'

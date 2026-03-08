@@ -1,0 +1,60 @@
+[0m[0m
+[0m[4mC:\Users\gopir\Downloads\ibm-project-master\ibm-project-master\project\src\components\layout\Header.tsx[24m[0m
+[0m  [2m83:9[22m  [31merror[39m  'handleLogout' is assigned a value but never used. Allowed unused vars must match /^_/u  [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\gopir\Downloads\ibm-project-master\ibm-project-master\project\src\pages\Admin\SellerApprovalPage.tsx[24m[0m
+[0m  [2m29:18[22m  [31merror[39m  'error' is defined but never used. Allowed unused caught errors must match /^_/u  [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m45:18[22m  [31merror[39m  'error' is defined but never used. Allowed unused caught errors must match /^_/u  [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\gopir\Downloads\ibm-project-master\ibm-project-master\project\src\pages\CheckoutPage.tsx[24m[0m
+[0m  [2m137:25[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mC:\Users\gopir\Downloads\ibm-project-master\ibm-project-master\project\src\pages\Dashboard\SellerDashboard.tsx[24m[0m
+[0m   [2m73:9[22m   [31merror[39m  Unexpected any. Specify a different type                                        [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m128:42[22m  [31merror[39m  Unexpected any. Specify a different type                                        [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m412:14[22m  [31merror[39m  'err' is defined but never used. Allowed unused caught errors must match /^_/u  [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\gopir\Downloads\ibm-project-master\ibm-project-master\project\src\pages\HomePage.tsx[24m[0m
+[0m  [2m58:23[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mC:\Users\gopir\Downloads\ibm-project-master\ibm-project-master\project\src\pages\LoginPage.tsx[24m[0m
+[0m  [2m79:19[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m99:19[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mC:\Users\gopir\Downloads\ibm-project-master\ibm-project-master\project\src\pages\ProductDetailsPage.tsx[24m[0m
+[0m  [2m39:23[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mC:\Users\gopir\Downloads\ibm-project-master\ibm-project-master\project\src\pages\StorePage.tsx[24m[0m
+[0m  [2m49:29[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mC:\Users\gopir\Downloads\ibm-project-master\ibm-project-master\project\src\pages\auth\CustomerLoginPage.tsx[24m[0m
+[0m  [2m54:8[22m  [33mwarning[39m  React Hook useEffect has unnecessary dependencies: 'isCheckingAuth' and 'user'. Either exclude them or remove the dependency array. Outer scope values like 'user' aren't valid dependencies because mutating them doesn't re-render the component  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\Users\gopir\Downloads\ibm-project-master\ibm-project-master\project\src\store\authStore.ts[24m[0m
+[0m   [2m48:31[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m   [2m77:31[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m105:38[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m106:34[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m125:42[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m131:38[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mC:\Users\gopir\Downloads\ibm-project-master\ibm-project-master\project\src\store\cartStore.ts[24m[0m
+[0m   [2m48:33[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m   [2m57:61[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m   [2m73:67[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m   [2m81:33[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m   [2m99:33[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m121:33[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m136:33[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m166:33[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mC:\Users\gopir\Downloads\ibm-project-master\ibm-project-master\project\src\store\locationStore.ts[24m[0m
+[0m   [2m42:26[22m  [31merror[39m  'e' is defined but never used. Allowed unused caught errors must match /^_/u    [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m   [2m72:38[22m  [31merror[39m  'err' is defined but never used. Allowed unused caught errors must match /^_/u  [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m117:26[22m  [31merror[39m  'err' is defined but never used. Allowed unused caught errors must match /^_/u  [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\Users\gopir\Downloads\ibm-project-master\ibm-project-master\project\src\store\productStore.ts[24m[0m
+[0m  [2m61:25[22m  [31merror[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[31m[1m✖ 31 problems (30 errors, 1 warning)[22m[39m[0m
+[0m[31m[1m[22m[39m[0m

@@ -29,6 +29,10 @@ const userSchema = new mongoose.Schema(
       enum: ['customer', 'seller', 'admin'],
       default: 'customer'
     },
+    permissions: {
+      type: [String],
+      default: []
+    },
     phone: {
       type: String,
       trim: true
@@ -51,6 +55,10 @@ const userSchema = new mongoose.Schema(
     isActive: {
       type: Boolean,
       default: true
+    },
+    tokenVersion: {
+      type: Number,
+      default: 0
     }
   },
   {
@@ -71,21 +79,6 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
-// Generate Access Token
-userSchema.methods.getSignedJwtToken = function () {
-  return jwt.sign({ id: this._id, role: this.role }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRE || '1h'
-  });
-};
-
-// Generate Refresh Token
-userSchema.methods.getRefreshToken = function () {
-  return jwt.sign(
-    { id: this._id, version: Math.random().toString(36).substring(7) },
-    process.env.JWT_REFRESH_SECRET,
-    { expiresIn: process.env.JWT_REFRESH_EXPIRE || '7d' }
-  );
-};
 // Indexes for performance
 userSchema.index({ role: 1 });
 

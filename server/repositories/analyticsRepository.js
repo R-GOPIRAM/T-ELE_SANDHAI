@@ -5,21 +5,29 @@ class AnalyticsRepository {
     async getSellerRevenue(sellerId) {
         const monthsAgo = new Date();
         monthsAgo.setMonth(monthsAgo.getMonth() - 6);
+        const sellerObjId = new mongoose.Types.ObjectId(sellerId);
 
         return await Order.aggregate([
             {
                 $match: {
-                    'items.seller': new mongoose.Types.ObjectId(sellerId),
+                    'items.seller': sellerObjId,
                     'paymentInfo.status': 'captured',
                     createdAt: { $gt: monthsAgo }
                 }
             },
-            { $unwind: '$items' },
             {
-                $match: {
-                    'items.seller': new mongoose.Types.ObjectId(sellerId)
+                $project: {
+                    createdAt: 1,
+                    items: {
+                        $filter: {
+                            input: '$items',
+                            as: 'item',
+                            cond: { $eq: ['$$item.seller', sellerObjId] }
+                        }
+                    }
                 }
             },
+            { $unwind: '$items' },
             {
                 $group: {
                     _id: {
@@ -27,7 +35,7 @@ class AnalyticsRepository {
                         year: { $year: '$createdAt' }
                     },
                     revenue: { $sum: { $multiply: ['$items.price', '$items.quantity'] } },
-                    orders: { $addToSet: '$_id' }
+                    orderCount: { $addToSet: '$_id' }
                 }
             },
             {
@@ -36,7 +44,7 @@ class AnalyticsRepository {
                     month: '$_id.month',
                     year: '$_id.year',
                     revenue: 1,
-                    orderCount: { $size: '$orders' }
+                    orderCount: { $size: '$orderCount' }
                 }
             },
             { $sort: { year: 1, month: 1 } }
@@ -67,19 +75,26 @@ class AnalyticsRepository {
     }
 
     async getTopProducts(sellerId, limit = 5) {
+        const sellerObjId = new mongoose.Types.ObjectId(sellerId);
         return await Order.aggregate([
             {
                 $match: {
-                    'items.seller': new mongoose.Types.ObjectId(sellerId),
+                    'items.seller': sellerObjId,
                     'paymentInfo.status': 'captured'
                 }
             },
-            { $unwind: '$items' },
             {
-                $match: {
-                    'items.seller': new mongoose.Types.ObjectId(sellerId)
+                $project: {
+                    items: {
+                        $filter: {
+                            input: '$items',
+                            as: 'item',
+                            cond: { $eq: ['$$item.seller', sellerObjId] }
+                        }
+                    }
                 }
             },
+            { $unwind: '$items' },
             {
                 $group: {
                     _id: '$items.product',
@@ -95,30 +110,42 @@ class AnalyticsRepository {
     }
 
     async getSellerSummary(sellerId) {
+        const sellerObjId = new mongoose.Types.ObjectId(sellerId);
         const stats = await Order.aggregate([
             {
                 $match: {
-                    'items.seller': new mongoose.Types.ObjectId(sellerId)
+                    'items.seller': sellerObjId
                 }
             },
             {
                 $facet: {
                     totals: [
-                        { $unwind: '$items' },
-                        { $match: { 'items.seller': new mongoose.Types.ObjectId(sellerId) } },
+                        {
+                            $project: {
+                                paymentStatus: '$paymentInfo.status',
+                                filteredItems: {
+                                    $filter: {
+                                        input: '$items',
+                                        as: 'item',
+                                        cond: { $eq: ['$$item.seller', sellerObjId] }
+                                    }
+                                }
+                            }
+                        },
+                        { $unwind: '$filteredItems' },
                         {
                             $group: {
                                 _id: null,
                                 totalRevenue: {
                                     $sum: {
                                         $cond: [
-                                            { $eq: ['$paymentInfo.status', 'captured'] },
-                                            { $multiply: ['$items.price', '$items.quantity'] },
+                                            { $eq: ['$paymentStatus', 'captured'] },
+                                            { $multiply: ['$filteredItems.price', '$filteredItems.quantity'] },
                                             0
                                         ]
                                     }
                                 },
-                                totalSales: { $sum: '$items.quantity' }
+                                totalSales: { $sum: '$filteredItems.quantity' }
                             }
                         }
                     ],

@@ -1,0 +1,22 @@
+
+C:\Users\gopir\Downloads\ibm-project-master\ibm-project-master\project\src\pages\Admin\LogisticsDashboard.tsx
+   7:42  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  41:44  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\gopir\Downloads\ibm-project-master\ibm-project-master\project\src\pages\Admin\StoreManagement.tsx
+  7:42  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\gopir\Downloads\ibm-project-master\ibm-project-master\project\src\pages\Dashboard\SellerOrdersPage.tsx
+   97:43   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  356:42   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  360:130  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  364:99   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  368:99   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  372:132  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\gopir\Downloads\ibm-project-master\ibm-project-master\project\src\pages\OrderTrackingPage.tsx
+  11:54  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  12:52  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 11 problems (11 errors, 0 warnings)
+

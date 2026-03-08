@@ -29,9 +29,8 @@ const handleJWTExpiredError = () => new AppError('Your token has expired! Please
 const sendErrorDev = (err, res) => {
     res.status(err.statusCode).json({
         success: false,
-        status: err.status,
-        error: err,
         message: err.message,
+        error: err,
         stack: err.stack
     });
 };
@@ -41,7 +40,6 @@ const sendErrorProd = (err, req, res) => {
     if (err.isOperational) {
         res.status(err.statusCode).json({
             success: false,
-            status: err.status,
             message: err.message
         });
     }
@@ -60,7 +58,6 @@ const sendErrorProd = (err, req, res) => {
         // 2) Send generic message
         res.status(500).json({
             success: false,
-            status: 'error',
             message: 'Something went very wrong! Please try again later.'
         });
     }

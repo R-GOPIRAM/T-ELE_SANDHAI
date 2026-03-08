@@ -27,11 +27,14 @@ exports.getMyBargains = catchAsync(async (req, res) => {
     const limit = parseInt(req.query.limit, 10) || 15;
     const result = await bargainService.getBargains(req.user.id, req.user.role, page, limit);
 
-    return sendResponse(res, 200, true, 'Bargains fetched successfully', result.bargains, null, {
-        results: result.bargains.length,
-        total: result.total,
-        page,
-        totalPages: Math.ceil(result.total / limit)
+    return sendResponse(res, 200, true, 'Bargains fetched successfully', {
+        bargains: result.bargains,
+        pagination: {
+            results: result.bargains.length,
+            total: result.total,
+            page,
+            totalPages: Math.ceil(result.total / limit)
+        }
     });
 });
 

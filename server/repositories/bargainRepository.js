@@ -9,7 +9,8 @@ class BargainRepository {
         return await Bargain.findById(id)
             .populate('productId', 'name images price')
             .populate('customerId', 'name email')
-            .populate('sellerId', 'name');
+            .populate('sellerId', 'name')
+            .lean();
     }
 
     async findActiveBargain(productId, customerId) {
@@ -17,33 +18,37 @@ class BargainRepository {
             productId,
             customerId,
             status: { $in: ['pending', 'countered'] }
-        });
+        }).lean();
     }
 
     async findBySeller(sellerId, filter = {}, page = 1, limit = 15) {
         const skip = (page - 1) * limit;
-        const bargains = await Bargain.find({ sellerId, ...filter })
-            .sort({ updatedAt: -1 })
-            .skip(skip)
-            .limit(limit)
-            .populate('productId', 'name images')
-            .populate('customerId', 'name')
-            .lean();
+        const [bargains, total] = await Promise.all([
+            Bargain.find({ sellerId, ...filter })
+                .sort({ updatedAt: -1 })
+                .skip(skip)
+                .limit(limit)
+                .populate('productId', 'name images')
+                .populate('customerId', 'name')
+                .lean(),
+            Bargain.countDocuments({ sellerId, ...filter })
+        ]);
 
-        const total = await Bargain.countDocuments({ sellerId, ...filter });
         return { bargains, total };
     }
 
     async findByCustomer(customerId, filter = {}, page = 1, limit = 15) {
         const skip = (page - 1) * limit;
-        const bargains = await Bargain.find({ customerId, ...filter })
-            .sort({ updatedAt: -1 })
-            .skip(skip)
-            .limit(limit)
-            .populate('productId', 'name images sellerName')
-            .lean();
+        const [bargains, total] = await Promise.all([
+            Bargain.find({ customerId, ...filter })
+                .sort({ updatedAt: -1 })
+                .skip(skip)
+                .limit(limit)
+                .populate('productId', 'name images sellerName')
+                .lean(),
+            Bargain.countDocuments({ customerId, ...filter })
+        ]);
 
-        const total = await Bargain.countDocuments({ customerId, ...filter });
         return { bargains, total };
     }
 

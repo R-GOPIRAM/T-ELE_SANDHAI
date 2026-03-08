@@ -9,9 +9,12 @@ exports.createProduct = catchAsync(async (req, res) => {
 
 exports.getProducts = catchAsync(async (req, res) => {
     const { products, total } = await ProductService.getProducts(req.query);
-    return sendResponse(res, 200, true, 'Products fetched successfully', products, null, {
-        count: products.length,
-        total
+    return sendResponse(res, 200, true, 'Products fetched successfully', {
+        products,
+        pagination: {
+            count: products.length,
+            total
+        }
     });
 });
 
@@ -49,10 +52,13 @@ exports.getSellerProducts = catchAsync(async (req, res) => {
 
     const { products, total } = await ProductService.getSellerProducts(sellerId, page, limit);
 
-    return sendResponse(res, 200, true, 'Seller products fetched successfully', products, null, {
-        count: products.length,
-        total,
-        page,
-        totalPages: Math.ceil(total / limit)
+    return sendResponse(res, 200, true, 'Seller products fetched successfully', {
+        products,
+        pagination: {
+            count: products.length,
+            total,
+            page,
+            totalPages: Math.ceil(total / limit)
+        }
     });
 });

@@ -3,6 +3,8 @@ const path = require('path');
 const fs = require('fs');
 const AppError = require('../utils/AppError');
 
+const crypto = require('crypto');
+
 // Ensure upload directory exists
 const uploadDir = path.join(__dirname, '..', 'uploads', 'seller-documents');
 if (!fs.existsSync(uploadDir)) {
@@ -15,10 +17,10 @@ const storage = multer.diskStorage({
         cb(null, uploadDir);
     },
     filename: (req, file, cb) => {
-        // Sanitize filename: Date + Random + Extension
-        const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+        // Sanitize filename: UUID + Extension
+        const uniqueId = crypto.randomUUID();
         const ext = path.extname(file.originalname).toLowerCase();
-        cb(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
+        cb(null, `${file.fieldname}-${uniqueId}${ext}`);
     }
 });
 

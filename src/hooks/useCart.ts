@@ -1,4 +1,4 @@
-import { useCartStore } from '../stores/cartStore';
+import { useCartStore } from '../store/cartStore';
 
 export function useCart() {
   const store = useCartStore();

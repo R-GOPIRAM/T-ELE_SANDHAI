@@ -6,7 +6,7 @@ class ProductRepository {
     }
 
     async findById(id) {
-        return await Product.findById(id).populate('shopOwnerId', 'name email address');
+        return await Product.findById(id).populate('shopOwnerId', 'name email address').lean();
     }
 
     async update(id, data) {
@@ -20,29 +20,30 @@ class ProductRepository {
     async findAll(queryObj, page = 1, limit = 12, sort = '-createdAt') {
         const skip = (page - 1) * limit;
 
-        // Execute query
-        const products = await Product.find(queryObj)
-            .sort(sort)
-            .skip(skip)
-            .limit(limit)
-            .populate('shopOwnerId', 'name')
-            .lean();
-
-        // Get total count for pagination
-        const total = await Product.countDocuments(queryObj);
+        // Execute queries in parallel
+        const [products, total] = await Promise.all([
+            Product.find(queryObj)
+                .sort(sort)
+                .skip(skip)
+                .limit(limit)
+                .populate('shopOwnerId', 'name')
+                .lean(),
+            Product.countDocuments(queryObj)
+        ]);
 
         return { products, total };
     }
 
     async findBySeller(sellerId, page = 1, limit = 12) {
         const skip = (page - 1) * limit;
-        const products = await Product.find({ shopOwnerId: sellerId })
-            .sort('-createdAt')
-            .skip(skip)
-            .limit(limit)
-            .lean();
-
-        const total = await Product.countDocuments({ shopOwnerId: sellerId });
+        const [products, total] = await Promise.all([
+            Product.find({ shopOwnerId: sellerId })
+                .sort('-createdAt')
+                .skip(skip)
+                .limit(limit)
+                .lean(),
+            Product.countDocuments({ shopOwnerId: sellerId })
+        ]);
         return { products, total };
     }
 }

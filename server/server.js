@@ -9,8 +9,52 @@ const cors = require('cors');
 const path = require('path');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
-const mongoSanitize = require('express-mongo-sanitize');
 require('dotenv').config();
+
+// --- Inline Security Middlewares ---
+
+// XSS Sanitization
+const cleanXss = (data) => {
+  if (typeof data === 'string') return data.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  if (Array.isArray(data)) return data.map(cleanXss);
+  if (typeof data === 'object' && data !== null) {
+    Object.keys(data).forEach(key => { data[key] = cleanXss(data[key]); });
+  }
+  return data;
+};
+const xssMiddleware = (req, res, next) => {
+  if (req.body) req.body = cleanXss(req.body);
+  if (req.query) req.query = cleanXss(req.query);
+  if (req.params) req.params = cleanXss(req.params);
+  next();
+};
+
+// NoSQL Injection Protection
+const sanitizeNoSql = (obj) => {
+  if (obj instanceof Object) {
+    for (const key in obj) {
+      if (key.startsWith('$')) delete obj[key];
+      else sanitizeNoSql(obj[key]);
+    }
+  }
+};
+const mongoSanitizeMiddleware = (req, res, next) => {
+  if (req.body) sanitizeNoSql(req.body);
+  if (req.query) sanitizeNoSql(req.query);
+  if (req.params) sanitizeNoSql(req.params);
+  next();
+};
+
+// HTTP Parameter Pollution Protection
+const hppMiddleware = (req, res, next) => {
+  if (req.query) {
+    Object.keys(req.query).forEach(key => {
+      if (Array.isArray(req.query[key])) req.query[key] = req.query[key][req.query[key].length - 1];
+    });
+  }
+  next();
+};
+
 const { validateEnv } = require('./config/config');
 
 // Ensure required environment variables are set
@@ -63,7 +107,13 @@ app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(cookieParser());
 
 // Data sanitization against NoSQL query injection
-app.use(mongoSanitize);
+app.use(mongoSanitizeMiddleware);
+
+// Data sanitization against XSS
+app.use(xssMiddleware);
+
+// Prevent parameter pollution
+app.use(hppMiddleware);
 
 // Logger Middleware
 app.use(loggerMiddleware);
@@ -82,6 +132,9 @@ app.use('/api/reviews', require('./routes/review.routes'));
 app.use('/api/wishlist', require('./routes/wishlist.routes'));
 app.use('/api/payment', require('./routes/payment.routes'));
 app.use('/api/analytics', require('./routes/analytics.routes'));
+app.use('/api/cart', require('./routes/cart.routes'));
+app.use('/api/shipping', require('./routes/shipping.routes'));
+app.use('/api/admin', require('./routes/admin.routes'));
 
 // Health Check
 app.get('/api/health', (req, res) => {

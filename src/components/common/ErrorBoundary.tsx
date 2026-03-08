@@ -1,6 +1,6 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
-import Button from './Button';
+import { Button } from '../ui/Button';
 
 interface Props {
     children: ReactNode;
@@ -28,20 +28,20 @@ class ErrorBoundary extends Component<Props, State> {
     public render() {
         if (this.state.hasError) {
             return (
-                <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-6 sm:p-12">
-                    <div className="max-w-xl w-full bg-white shadow-2xl rounded-3xl p-8 sm:p-12 text-center border border-gray-100 animate-fade-in-up">
-                        <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner">
-                            <AlertTriangle className="h-10 w-10 text-red-500" />
+                <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 sm:p-12">
+                    <div className="max-w-xl w-full bg-card shadow-2xl rounded-3xl p-8 sm:p-12 text-center border border-border animate-fade-in-up">
+                        <div className="w-20 h-20 bg-danger/10 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner">
+                            <AlertTriangle className="h-10 w-10 text-danger" />
                         </div>
 
-                        <h2 className="text-3xl font-extrabold text-gray-900 mb-4 tracking-tight">System Encountered an Error</h2>
-                        <p className="text-lg text-gray-600 mb-8 font-medium">
+                        <h2 className="text-3xl font-extrabold text-text-primary mb-4 tracking-tight">System Encountered an Error</h2>
+                        <p className="text-lg text-text-secondary mb-8 font-medium">
                             We've encountered a synchronized state mismatch. Don't worry, your data is safe.
                         </p>
 
                         {this.state.error && (
-                            <div className="bg-gray-50 border border-gray-200 text-gray-500 p-5 rounded-2xl text-sm mb-10 overflow-auto max-h-40 text-left font-mono shadow-inner">
-                                <span className="text-red-600 font-bold mr-2">Error:</span>
+                            <div className="bg-background border border-border text-text-secondary p-5 rounded-2xl text-sm mb-10 overflow-auto max-h-40 text-left font-mono shadow-inner">
+                                <span className="text-danger font-bold mr-2">Error:</span>
                                 {this.state.error.message}
                             </div>
                         )}

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useAuthStore } from '../stores/authStore';
+import { useAuthStore } from '../store/authStore';
 
 export function useAuth() {
   const store = useAuthStore();
@@ -17,6 +17,7 @@ export function useAuth() {
     register: store.register,
     logout: store.logout,
     loading: store.isLoading,
+    isCheckingAuth: store.isCheckingAuth,
     error: store.error,
     isAuthenticated: !!store.user,
   };

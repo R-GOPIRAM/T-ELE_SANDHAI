@@ -3,10 +3,7 @@ const { MongoMemoryServer } = require('mongodb-memory-server');
 
 let mongoServer;
 
-/**
- * Connect to the in-memory database.
- */
-module.exports.connect = async () => {
+beforeAll(async () => {
     // Prevent MongooseError: Cannot overwrite `X` model once compiled.
     mongoose.models = {};
     mongoose.modelSchemas = {};
@@ -20,23 +17,17 @@ module.exports.connect = async () => {
     };
 
     await mongoose.connect(uri, mongooseOpts);
-};
+});
 
-/**
- * Drop database, close the connection and stop mongodb.
- */
-module.exports.closeDatabase = async () => {
+afterAll(async () => {
     if (mongoServer) {
         await mongoose.connection.dropDatabase();
         await mongoose.connection.close();
         await mongoServer.stop();
     }
-};
+});
 
-/**
- * Remove all the data for all db collections.
- */
-module.exports.clearDatabase = async () => {
+const clearDatabase = async () => {
     if (mongoServer) {
         const collections = mongoose.connection.collections;
 
@@ -46,3 +37,5 @@ module.exports.clearDatabase = async () => {
         }
     }
 };
+
+module.exports = { clearDatabase };

@@ -4,23 +4,74 @@
 
 @layer base {
   body {
-    @apply antialiased text-gray-800 bg-gray-50 selection:bg-blue-500 selection:text-white font-sans;
+    @apply antialiased text-text-primary bg-background selection:bg-primary selection:text-white font-sans;
   }
 
+  /* Typography Hierarchy */
   h1 {
-    @apply text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900;
+    @apply text-[52px] font-heading font-bold tracking-tight text-text-primary leading-tight;
   }
 
   h2 {
-    @apply text-2xl md:text-3xl font-bold tracking-tight text-gray-900;
+    @apply text-[32px] font-heading font-semibold tracking-tight text-text-primary leading-tight;
   }
 
   h3 {
-    @apply text-xl font-bold text-gray-900;
+    @apply text-[22px] font-heading font-semibold text-text-primary leading-snug;
+  }
+
+  h4 {
+    @apply text-[18px] font-heading font-semibold text-text-primary leading-snug;
   }
 
   p {
-    @apply leading-relaxed text-gray-600;
+    @apply font-sans text-[15px] leading-relaxed text-text-secondary;
+  }
+
+  .text-small {
+    @apply text-[14px] text-text-secondary;
+  }
+}
+
+@layer components {
+
+  /* Buttons */
+  .btn-primary {
+    @apply bg-primary text-white rounded-lg font-medium transition-all duration-300 hover:bg-primary-hover hover:scale-[1.02] shadow-sm hover:shadow-lg active:scale-95;
+  }
+
+  .btn-bargain {
+    @apply bg-bargain text-white rounded-lg font-medium transition-all duration-300 hover:bg-bargain-hover hover:scale-[1.02] shadow-sm hover:shadow-lg active:scale-95;
+  }
+
+  .btn-seller {
+    @apply bg-seller text-white rounded-lg font-medium transition-all duration-300 hover:bg-seller-hover hover:scale-[1.02] shadow-sm hover:shadow-lg active:scale-95;
+  }
+
+  /* Badges */
+  .badge-bargain {
+    @apply bg-bargain text-white text-xs px-3 py-1 font-bold rounded-md shadow-sm;
+  }
+
+  .badge-seller {
+    @apply bg-seller text-white text-xs px-3 py-1 font-bold rounded-md shadow-sm;
+  }
+
+  /* Cards */
+  .card {
+    @apply bg-card border border-border rounded-xl shadow-sm p-5 transition-all duration-300 hover:shadow-lg;
+  }
+
+  .card-hover-lift {
+    @apply transition-all duration-300 hover:-translate-y-[6px] hover:shadow-lg border border-border rounded-xl;
+  }
+
+  .section-title {
+    @apply text-[32px] font-heading font-semibold text-text-primary mb-8;
+  }
+
+  .section-container {
+    @apply py-[80px] max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
 }
 
@@ -31,27 +82,19 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  @apply bg-background;
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  @apply bg-border;
   border-radius: 10px;
-  border: 2px solid #f1f5f9;
+  border: 2px solid;
+  @apply border-background;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
-
-/* Glassmorphism Classes */
-.glass {
-  @apply bg-white/70 backdrop-blur-xl border border-white/50 shadow-sm transition-all duration-300;
-}
-
-.glass:hover {
-  @apply bg-white/80 shadow-md;
+  @apply bg-text-secondary;
 }
 
 /* Premium Animations */

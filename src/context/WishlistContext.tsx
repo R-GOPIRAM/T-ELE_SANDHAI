@@ -1,5 +1,6 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import api from '../services/api';
+import api from '../services/apiClient';
 import toast from 'react-hot-toast';
 
 interface WishlistItem {
@@ -63,7 +64,8 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
                 setWishlistItems(data.data.items);
                 toast.success('Added to wishlist❤️');
             }
-        } catch (error: any) {
+        } catch (err: unknown) {
+            const error = err as { response?: { status?: number } };
             if (error.response?.status === 401) {
                 toast.error('Please login to add to wishlist');
             } else {
@@ -79,7 +81,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
                 setWishlistItems(data.data.items);
                 toast.success('Removed from wishlist');
             }
-        } catch (error) {
+        } catch (_error) {
             toast.error('Failed to remove from wishlist');
         }
     };

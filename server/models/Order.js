@@ -40,7 +40,9 @@ const orderSchema = new mongoose.Schema(
       state: { type: String, required: true },
       zipCode: { type: String, required: true },
       country: { type: String, required: true },
-      phone: { type: String, required: true }
+      phone: { type: String, required: true },
+      latitude: Number,
+      longitude: Number
     },
     paymentInfo: {
       razorpayOrderId: { type: String },
@@ -51,6 +53,14 @@ const orderSchema = new mongoose.Schema(
         enum: ['pending', 'captured', 'failed', 'refunded'],
         default: 'pending'
       },
+      paymentStatus: {
+        type: String,
+        enum: ['Pending', 'Paid', 'Refunded'],
+        default: 'Pending'
+      },
+      paymentReceived: { type: Boolean, default: false },
+      paymentDate: Date,
+      transactionId: String,
       method: {
         type: String,
         enum: ['card', 'upi', 'cod', 'netbanking', 'wallet'],
@@ -66,6 +76,25 @@ const orderSchema = new mongoose.Schema(
       enum: ['Processing', 'Shipped', 'Delivered', 'Cancelled'],
       default: 'Processing'
     },
+    shipments: [{
+      sellerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+      storeName: String,
+      pickupLocation: String,
+      distanceFromCustomer: Number,
+      courierName: String,
+      courierId: String,
+      estimatedDeliveryDays: String,
+      shippingCost: Number,
+      shipmentId: String,
+      awb: String,
+      pickupDate: Date,
+      trackingUrl: String,
+      status: {
+        type: String,
+        enum: ['Pending', 'Pickup Scheduled', 'Shipped', 'Out for Delivery', 'Delivered', 'Returned', 'Cancelled'],
+        default: 'Pending'
+      }
+    }],
     deliveredAt: Date,
     shippedAt: Date,
     cancelledAt: Date
@@ -77,7 +106,8 @@ const orderSchema = new mongoose.Schema(
 );
 // Indexes for production analytics capability
 orderSchema.index({ user: 1 });
-orderSchema.index({ 'items.seller': 1 }); // Essential for seller analytics aggregations
+orderSchema.index({ 'items.seller': 1, 'paymentInfo.status': 1, createdAt: -1 }); // Compound for analytics
+orderSchema.index({ 'shipments.status': 1, 'shipments.awb': 1 }); // For sync job
 orderSchema.index({ orderStatus: 1 });
 orderSchema.index({ createdAt: -1 });
 
