@@ -140,6 +140,12 @@ if (process.env.NODE_ENV === "production") {
   app.use(express.static(clientBuildPath));
 }
 
+app.get("/", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "Inspirathon API running 🚀"
+  });
+});
 // Routes
 app.use("/api/auth", require("./routes/auth.routes"));
 app.use("/api/products", require("./routes/product.routes"));
