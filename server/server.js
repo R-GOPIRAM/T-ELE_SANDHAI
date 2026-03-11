@@ -14,7 +14,7 @@ if (process.env.NODE_ENV !== "production") {
 // XSS Sanitization
 const cleanXss = (data) => {
   if (typeof data === "string")
-    return data.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    return data.replace(/</g, "<").replace(/>/g, ">");
   if (Array.isArray(data)) return data.map(cleanXss);
   if (typeof data === "object" && data !== null) {
     Object.keys(data).forEach((key) => {
@@ -131,6 +131,16 @@ app.use(hppMiddleware);
 // Logger
 app.use(loggerMiddleware);
 
+/* ================================
+ROOT ROUTE (for Render health)
+================================ */
+app.get("/", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "Inspirathon API running 🚀",
+  });
+});
+
 // Static files
 const clientBuildPath = path.join(__dirname, "..", "dist");
 
@@ -140,12 +150,6 @@ if (process.env.NODE_ENV === "production") {
   app.use(express.static(clientBuildPath));
 }
 
-app.get("/", (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "Inspirathon API running 🚀"
-  });
-});
 // Routes
 app.use("/api/auth", require("./routes/auth.routes"));
 app.use("/api/products", require("./routes/product.routes"));
