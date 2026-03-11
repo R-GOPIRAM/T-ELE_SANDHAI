@@ -31,6 +31,18 @@ const sellerSchema = new mongoose.Schema({
   businessCategory: String,
   businessDescription: String,
   yearsInBusiness: Number,
+  rating: {
+    type: Number,
+    default: 0
+  },
+  reviewCount: {
+    type: Number,
+    default: 0
+  },
+  openHours: {
+    open: { type: String, default: '09:00' },
+    close: { type: String, default: '21:00' }
+  },
   sellerStatus: {
     type: String,
     enum: ['pending', 'approved', 'rejected'],
@@ -55,5 +67,8 @@ const sellerSchema = new mongoose.Schema({
   toJSON: { virtuals: true },
   toObject: { virtuals: true }
 });
+
+// Index for primary lookup by userId (one seller profile per user)
+sellerSchema.index({ userId: 1 }, { unique: true });
 
 module.exports = mongoose.model('Seller', sellerSchema);

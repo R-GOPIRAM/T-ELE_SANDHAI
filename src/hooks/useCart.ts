@@ -5,6 +5,7 @@ export function useCart() {
 
   return {
     items: store.items,
+    isLoading: store.isLoading,
     addToCart: store.addItem,
     removeFromCart: store.removeItem,
     updateQuantity: store.updateQuantity,

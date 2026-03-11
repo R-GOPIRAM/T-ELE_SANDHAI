@@ -152,6 +152,16 @@ class AnalyticsRepository {
                     orderCount: [
                         { $count: 'count' }
                     ],
+                    ordersToday: [
+                        {
+                            $match: {
+                                createdAt: {
+                                    $gte: new Date(new Date().setHours(0, 0, 0, 0))
+                                }
+                            }
+                        },
+                        { $count: 'count' }
+                    ],
                     uniqueCustomers: [
                         { $group: { _id: '$user' } },
                         { $count: 'count' }
@@ -164,6 +174,7 @@ class AnalyticsRepository {
             totalRevenue: stats[0].totals[0]?.totalRevenue || 0,
             totalSales: stats[0].totals[0]?.totalSales || 0,
             totalOrders: stats[0].orderCount[0]?.count || 0,
+            ordersToday: stats[0].ordersToday[0]?.count || 0,
             uniqueCustomers: stats[0].uniqueCustomers[0]?.count || 0
         };
     }

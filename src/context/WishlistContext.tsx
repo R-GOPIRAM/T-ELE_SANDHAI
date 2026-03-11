@@ -1,7 +1,8 @@
 /* eslint-disable react-refresh/only-export-components */
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import api from '../services/apiClient';
 import toast from 'react-hot-toast';
+import { useAuthStore } from '../store/authStore';
 
 interface WishlistItem {
     product: {
@@ -24,38 +25,45 @@ interface WishlistContextType {
     addToWishlist: (productId: string) => Promise<void>;
     removeFromWishlist: (productId: string) => Promise<void>;
     isInWishlist: (productId: string) => boolean;
+    refetchWishlist: () => Promise<void>;
 }
 
 const WishlistContext = createContext<WishlistContextType | undefined>(undefined);
 
 export function WishlistProvider({ children }: { children: React.ReactNode }) {
     const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
 
-    // Note: ideally we fetch this when the user logs in. 
-    // For now, fetch on mount if token exists.
-    useEffect(() => {
-        const fetchWishlist = async () => {
-            try {
-                const token = localStorage.getItem('token');
-                if (!token) {
-                    setIsLoading(false);
-                    return;
-                }
+    // Use auth store user state — NOT localStorage (auth uses httpOnly cookies, no token in localStorage)
+    const user = useAuthStore((state) => state.user);
+    const isCheckingAuth = useAuthStore((state) => state.isCheckingAuth);
 
-                const { data } = await api.get('/wishlist');
-                if (data.success && data.data) {
-                    setWishlistItems(data.data.items);
-                }
-            } catch (error) {
-                console.error('Failed to fetch wishlist', error);
-            } finally {
-                setIsLoading(false);
+    const fetchWishlist = useCallback(async () => {
+        // Only fetch once auth check is complete and user is confirmed authenticated
+        if (isCheckingAuth) return;
+        if (!user) {
+            setWishlistItems([]);
+            setIsLoading(false);
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            const { data } = await api.get('/wishlist');
+            if (data.success && data.data) {
+                setWishlistItems(data.data.items);
             }
-        };
+        } catch (error) {
+            console.error('Failed to fetch wishlist', error);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [user, isCheckingAuth]);
 
+    // Fetch wishlist whenever auth state resolves (user logs in / out)
+    useEffect(() => {
         fetchWishlist();
-    }, []);
+    }, [fetchWishlist]);
 
     const addToWishlist = async (productId: string) => {
         try {
@@ -92,7 +100,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
 
     return (
         <WishlistContext.Provider
-            value={{ wishlistItems, isLoading, addToWishlist, removeFromWishlist, isInWishlist }}
+            value={{ wishlistItems, isLoading, addToWishlist, removeFromWishlist, isInWishlist, refetchWishlist: fetchWishlist }}
         >
             {children}
         </WishlistContext.Provider>

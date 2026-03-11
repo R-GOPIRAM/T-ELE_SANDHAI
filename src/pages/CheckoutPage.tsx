@@ -34,13 +34,17 @@ const checkoutSchema = z.object({
     deliveryType: z.enum(['delivery', 'pickup']),
     street: z.string().optional(),
     city: z.string().optional(),
+    state: z.string().optional(),
     zipCode: z.string().optional(),
+    country: z.string().optional(),
     paymentMethod: z.enum(['card', 'upi', 'cod']),
 }).superRefine((data, ctx) => {
     if (data.deliveryType === 'delivery') {
         if (!data.street) ctx.addIssue({ code: 'custom', message: 'Street is required for delivery', path: ['street'] });
         if (!data.city) ctx.addIssue({ code: 'custom', message: 'City is required for delivery', path: ['city'] });
+        if (!data.state) ctx.addIssue({ code: 'custom', message: 'State is required for delivery', path: ['state'] });
         if (!data.zipCode) ctx.addIssue({ code: 'custom', message: 'ZIP Code is required for delivery', path: ['zipCode'] });
+        if (!data.country) ctx.addIssue({ code: 'custom', message: 'Country is required for delivery', path: ['country'] });
     }
 });
 
@@ -94,7 +98,7 @@ export default function CheckoutPage() {
 
     const handleNextStep = async () => {
         if (currentStep === 'address') {
-            const result = await trigger(['name', 'email', 'phone', 'street', 'city', 'zipCode', 'deliveryType']);
+            const result = await trigger(['name', 'email', 'phone', 'street', 'city', 'state', 'zipCode', 'country', 'deliveryType']);
             if (result) setCurrentStep('payment');
             else toast.error('Please fix the errors in the form');
         } else if (currentStep === 'payment') {
@@ -110,16 +114,21 @@ export default function CheckoutPage() {
                     product: item.productId,
                     quantity: item.quantity,
                     price: item.price,
-                    seller: item.sellerId
+                    seller: item.sellerId,
+                    name: item.product?.name,
+                    image: item.product?.images?.[0]
                 })),
                 shippingAddress: {
                     street: data.street || 'In-store Pickup',
                     city: data.city || 'Standard',
-                    zipCode: data.zipCode || '000000'
+                    state: data.state || 'Standard',
+                    zipCode: data.zipCode || '000000',
+                    country: data.country || 'India',
+                    phone: data.phone
                 },
                 paymentInfo: {
                     method: data.paymentMethod,
-                    status: data.paymentMethod === 'cod' ? 'pending' : 'completed'
+                    status: data.paymentMethod === 'cod' ? 'pending' : 'captured'
                 },
                 deliveryType: data.deliveryType,
                 totalAmount: total,
@@ -305,7 +314,7 @@ export default function CheckoutPage() {
                                                             error={errors.street?.message}
                                                             placeholder="Flat, Building, Street Info"
                                                         />
-                                                        <div className="grid grid-cols-2 gap-6">
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                                             <Input
                                                                 label="City"
                                                                 {...register('city')}
@@ -313,10 +322,22 @@ export default function CheckoutPage() {
                                                                 placeholder="Location City"
                                                             />
                                                             <Input
+                                                                label="State"
+                                                                {...register('state')}
+                                                                error={errors.state?.message}
+                                                                placeholder="State/Province"
+                                                            />
+                                                            <Input
                                                                 label="ZIP Code"
                                                                 {...register('zipCode')}
                                                                 error={errors.zipCode?.message}
                                                                 placeholder="Postal code"
+                                                            />
+                                                            <Input
+                                                                label="Country"
+                                                                {...register('country')}
+                                                                error={errors.country?.message}
+                                                                placeholder="Country"
                                                             />
                                                         </div>
                                                     </motion.div>
@@ -417,7 +438,7 @@ export default function CheckoutPage() {
                                                         <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shrink-0"><MapPin className="w-5 h-5" /></div>
                                                         <p className="text-sm text-text-secondary font-bold leading-relaxed">
                                                             {formData.deliveryType === 'delivery' ? (
-                                                                <>{formData.street}, {formData.city}, {formData.zipCode}</>
+                                                                <>{formData.street}, {formData.city}, {formData.state}, {formData.zipCode}, {formData.country}</>
                                                             ) : (
                                                                 <span className="text-seller uppercase tracking-widest text-xs">Self-Pickup from Neighborhood Center</span>
                                                             )}

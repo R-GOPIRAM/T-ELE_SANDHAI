@@ -133,17 +133,17 @@ export default function BargainChat({ bargainId }: BargainChatProps) {
         <div className="flex flex-col h-[700px] w-full bg-card rounded-[2.5rem] shadow-2xl shadow-border/50 border border-border overflow-hidden relative">
 
             {/* Header: Immersive Chat Top Bar */}
-            <div className="bg-card/80 backdrop-blur-xl p-6 border-b border-gray-50 flex justify-between items-center relative z-20">
+            <div className="bg-card/80 backdrop-blur-xl p-6 border-b border-border flex justify-between items-center relative z-20">
                 <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 bg-gradient-to-br from-primary-50 to-indigo-50 rounded-2xl flex items-center justify-center text-primary shadow-inner group relative">
+                    <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center text-primary shadow-inner group relative">
                         {isSeller ? <User className="w-7 h-7" /> : <Store className="w-7 h-7" />}
-                        <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-seller rounded-full border-2 border-card" />
+                        <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-seller rounded-full border-2 border-card shadow-sm" />
                     </div>
                     <div>
-                        <h3 className="font-black text-text-primary text-lg leading-none mb-1.5">{bargain.productId.name}</h3>
+                        <h3 className="font-heading font-black text-text-primary text-xl leading-none mb-1.5">{bargain.productId.name}</h3>
                         <div className="flex items-center gap-3">
-                            <Badge variant="outline" className="text-[9px] py-0 border-border text-text-secondary/50">ID: {bargainId.slice(-6)}</Badge>
-                            <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-lg flex items-center gap-1">
+                            <Badge variant="outline" className="text-[9px] py-0 border-border text-text-secondary">ID: {bargainId.slice(-6)}</Badge>
+                            <span className="text-xs font-black text-primary bg-primary/10 px-2 py-0.5 rounded-lg flex items-center gap-1">
                                 <IndianRupee className="w-3 h-3" /> {bargain.offeredPrice.toLocaleString('en-IN')}
                             </span>
                         </div>
@@ -151,13 +151,13 @@ export default function BargainChat({ bargainId }: BargainChatProps) {
                 </div>
 
                 <div className="flex items-center gap-3">
-                    <div className={`px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase border ${bargain.status === 'accepted' ? 'bg-seller/10 text-seller-hover border-seller/20' :
-                        bargain.status === 'rejected' ? 'bg-danger/10 text-red-700 border-red-100' :
-                            'bg-accent-50 text-accent-700 border-accent-100 animate-pulse'
+                    <div className={`px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase border ${bargain.status === 'accepted' ? 'bg-seller/10 text-seller border-seller/20' :
+                        bargain.status === 'rejected' ? 'bg-danger/10 text-danger border-danger/20' :
+                            'bg-warning/10 text-warning border-warning/20 animate-pulse'
                         }`}>
                         {bargain.status}
                     </div>
-                    <button className="p-2.5 hover:bg-background rounded-xl transition-colors text-text-secondary/50">
+                    <button className="p-2.5 hover:bg-background rounded-xl transition-colors text-text-secondary">
                         <MoreVertical className="w-5 h-5" />
                     </button>
                 </div>
@@ -243,9 +243,9 @@ export default function BargainChat({ bargainId }: BargainChatProps) {
                                     >
                                         <Button
                                             size="md"
-                                            variant="success"
+                                            variant="seller"
                                             onClick={() => handleStatusUpdate('accepted')}
-                                            className="px-8 font-black rounded-2xl shadow-xl shadow-success-500/20"
+                                            className="px-8 font-black rounded-2xl shadow-xl shadow-seller/20"
                                         >
                                             <Handshake className="w-5 h-5 mr-2" />
                                             Accept Deal
@@ -254,7 +254,7 @@ export default function BargainChat({ bargainId }: BargainChatProps) {
                                             size="md"
                                             variant="outline"
                                             onClick={() => handleStatusUpdate('rejected')}
-                                            className="bg-card border-2 border-red-100 text-danger hover:bg-danger/10 rounded-2xl font-black"
+                                            className="bg-card border-2 border-border text-danger hover:bg-danger/5 rounded-2xl font-black"
                                         >
                                             <X className="w-5 h-5 mr-2" />
                                             Reject
@@ -309,26 +309,26 @@ export default function BargainChat({ bargainId }: BargainChatProps) {
                 </div>
             ) : (
                 <div className="bg-background p-8 border-t border-border text-center relative overflow-hidden">
-                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-success-500 via-primary-500 to-indigo-500 opacity-50" />
-                    <h3 className="text-2xl font-black text-text-primary mb-2 flex items-center justify-center gap-3">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-seller via-primary to-bargain opacity-50" />
+                    <h3 className="text-2xl font-heading font-black text-text-primary mb-2 flex items-center justify-center gap-3">
                         {bargain.status === 'accepted' ? <Handshake className="w-8 h-8 text-seller" /> : <X className="w-8 h-8 text-danger" />}
-                        Deal {bargain.status.toUpperCase()}
+                        Negotiation {bargain.status.toUpperCase()}
                     </h3>
                     {bargain.status === 'accepted' ? (
                         <div className="space-y-6">
-                            <p className="text-text-secondary font-bold">Successfully negotiated at <span className="text-3xl font-black text-seller bg-seller/10 px-4 py-1 rounded-2xl ml-2">₹{bargain.finalPrice}</span></p>
+                            <p className="text-text-secondary font-bold text-lg">Successfully negotiated at <span className="text-3xl font-black text-seller bg-seller/10 px-6 py-2 rounded-2xl ml-2 shadow-inner border border-seller/20">₹{bargain.finalPrice}</span></p>
                             {!isSeller && (
                                 <Button
                                     size="lg"
                                     onClick={() => navigate('/cart')}
-                                    className="bg-gray-900 text-white hover:bg-black px-12 py-7 rounded-[2rem] font-black text-xl shadow-2xl"
+                                    className="bg-text-primary text-white hover:bg-text-primary/90 px-12 py-8 rounded-3xl font-black text-xl shadow-2xl shadow-text-primary/20"
                                 >
                                     Proceed to Checkout
                                 </Button>
                             )}
                         </div>
                     ) : (
-                        <p className="text-text-secondary/50 font-black uppercase tracking-widest text-xs">This negotiation thread is closed.</p>
+                        <p className="text-text-secondary font-black uppercase tracking-widest text-[10px]">This negotiation thread is closed.</p>
                     )}
                 </div>
             )}

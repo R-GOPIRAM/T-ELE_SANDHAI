@@ -27,8 +27,7 @@ const cartSchema = new mongoose.Schema(
         userId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',
-            required: [true, 'User ID is required'],
-            unique: true
+            required: [true, 'User ID is required']
         },
         items: [cartItemSchema]
     },
@@ -51,7 +50,7 @@ cartSchema.virtual('totalPrice').get(function () {
 cartSchema.set('toJSON', { virtuals: true });
 cartSchema.set('toObject', { virtuals: true });
 
-// Indexes
-cartSchema.index({ userId: 1 });
+// Indexes — keep unique constraint here only (avoids duplicate implicit index)
+cartSchema.index({ userId: 1 }, { unique: true });
 
 module.exports = mongoose.model('Cart', cartSchema);

@@ -94,3 +94,22 @@ exports.getStoreProfile = catchAsync(async (req, res, next) => {
 
     return sendResponse(res, 200, true, 'Store profile fetched successfully', publicStoreData);
 });
+
+exports.getNearbyStores = catchAsync(async (req, res) => {
+    const { lat, lng, radius } = req.query;
+
+    if (!lat || !lng) {
+        throw new AppError('Coordinates (lat, lng) are required for proximity search', 400);
+    }
+
+    const stores = await SellerService.getNearbyStores(
+        parseFloat(lat),
+        parseFloat(lng),
+        parseFloat(radius) || 50
+    );
+
+    return sendResponse(res, 200, true, 'Nearby stores fetched successfully', {
+        stores,
+        count: stores.length
+    });
+});

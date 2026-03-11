@@ -124,6 +124,10 @@ class OrderService {
             // Prepare shipments array using Shiprocket
             const finalShipments = [];
 
+            // Fetch user for billing details
+            const User = require('../models/User');
+            const user = await User.findById(userId).lean();
+
             for (const [sellerIdStr, shipData] of shipmentsMap.entries()) {
                 let courierName = 'Delhivery';
                 let shippingCost = 50;
@@ -171,13 +175,14 @@ class OrderService {
                         order_id: `ORD-${Date.now()}-${sellerIdStr.substring(0, 4)}`,
                         order_date: new Date().toISOString(),
                         pickup_location: shipData.pickupLocation,
-                        billing_customer_name: 'Customer', // Would tie to req.user ideally
+                        billing_customer_name: user?.name || 'Customer',
                         billing_last_name: '',
+                        billing_email: user?.email || '',
                         billing_address: shippingAddress.street,
                         billing_city: shippingAddress.city,
                         billing_state: shippingAddress.state,
                         billing_pincode: shippingAddress.zipCode,
-                        billing_phone: shippingAddress.phone || '9999999999',
+                        billing_phone: shippingAddress.phone || user?.phone || '9999999999',
                         shipping_is_billing: true,
                         order_items: shipData.items.map(i => ({ name: i.name, sku: i.product.toString(), units: i.quantity, selling_price: i.price })),
                         payment_method: paymentInfo?.method === 'cod' ? 'COD' : 'Prepaid',
@@ -313,6 +318,30 @@ class OrderService {
 
         await order.save();
         return order;
+    }
+
+    async updateOrderStatus(id, userId, role, status) {
+        // Find order and check permissions
+        const order = await this.getOrder(id, userId, role);
+
+        // Use repository to apply status-specific logic (timestamps)
+        const updatedOrder = await OrderRepository.updateStatus(id, status);
+        if (!updatedOrder) throw new AppError('Order update failed', 500);
+
+        // Emit real-time notification to customer
+        try {
+            const { getIo } = require('../socket');
+            const io = getIo();
+            io.to(`user_${order.user._id}`).emit('order_update', {
+                message: `Your order status has changed to: ${status}`,
+                orderId: order.orderId,
+                status
+            });
+        } catch (err) {
+            // Socket skip
+        }
+
+        return updatedOrder;
     }
 
     async updatePaymentStatusByRazorpayId(razorpayOrderId, { paymentId, status, method }) {

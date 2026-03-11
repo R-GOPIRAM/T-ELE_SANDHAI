@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Mail, Lock, Shield, ArrowRight } from 'lucide-react';
+import { Mail, Lock, Shield } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -25,7 +25,7 @@ export default function AdminLoginPage() {
 
     useEffect(() => {
         if (user && !isCheckingAuth) {
-            navigate('/dashboard/logistics');
+            navigate('/admin');
         }
     }, [user, isCheckingAuth, navigate]);
 
@@ -39,54 +39,80 @@ export default function AdminLoginPage() {
         try {
             const loggedInUser = await login(data);
             if (loggedInUser.role !== 'admin') {
-                toast.error(`Unauthorized access. Role mismatch (${loggedInUser.role}).`);
+                toast.error(`Terminal Access Denied: Unauthorized role.`);
                 return;
             }
-            toast.success(`Welcome back Admin, ${loggedInUser.name}!`);
+            toast.success(`System Access Granted. Welcome, Admin.`);
             navigate('/admin/dashboard');
-        } catch {
-            toast.error('System access denied.');
+        } catch (err: any) {
+            const message = err.response?.data?.message || 'Authentication sequence failed.';
+            toast.error(message);
         }
     };
 
     return (
-        <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-            <div className="max-w-[480px] w-full bg-black border border-gray-800 rounded-[3rem] shadow-2xl p-10">
-                <div className="text-center mb-10">
-                    <div className="w-16 h-16 bg-red-600/20 border border-red-500 rounded-2xl flex items-center justify-center mx-auto mb-6 text-danger">
-                        <Shield className="w-8 h-8" />
+        <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4 relative overflow-hidden">
+            {/* Animated Background Gradients */}
+            <div className="absolute top-1/4 -right-1/4 w-[600px] h-[600px] bg-red-600/10 rounded-full blur-[120px] animate-pulse-slow -z-10" />
+            <div className="absolute -bottom-1/4 -left-1/4 w-[500px] h-[500px] bg-gray-600/10 rounded-full blur-[100px] animate-pulse-slow -z-10" />
+
+            <div className="w-full max-w-md">
+                <div
+                    className="backdrop-blur-xl bg-gray-900/60 border border-gray-800/80 rounded-[2rem] p-10 relative z-10 shadow-2xl shadow-red-900/10"
+                >
+                    <div className="text-center mb-10">
+                        <div className="w-20 h-20 bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700/50 rounded-2xl flex items-center justify-center mx-auto mb-6 text-red-500 shadow-lg shadow-black transform rotate-3 hover:rotate-6 transition-transform duration-300">
+                            <Shield className="w-10 h-10" />
+                        </div>
+                        <h2 className="text-4xl font-heading font-black tracking-[0.2em] text-white mb-2 uppercase italic">
+                            Terminal
+                        </h2>
+                        <div className="flex items-center justify-center gap-2 mb-4">
+                            <div className="h-1.5 w-1.5 rounded-full bg-red-600 animate-pulse" />
+                            <p className="text-red-500/80 text-[10px] uppercase tracking-[0.4em] font-black">
+                                Security Level 4 • Restricted Area
+                            </p>
+                        </div>
                     </div>
-                    <h2 className="text-3xl font-black text-white">Admin Terminal</h2>
-                    <p className="text-text-secondary mt-2 text-xs uppercase tracking-widest">Restricted Access Zone</p>
+
+                    <form onSubmit={handleLoginSubmit(onLoginSubmit)} className="space-y-6">
+                        <div className="space-y-5">
+                            <Input
+                                placeholder="System Email"
+                                icon={Mail}
+                                {...loginRegister('email')}
+                                error={loginErrors.email?.message}
+                                className="bg-black/50 border-gray-800 text-white placeholder-gray-600 focus:border-red-500/50 focus:bg-black transition-colors"
+                            />
+
+                            <Input
+                                placeholder="Passphrase"
+                                icon={Lock}
+                                type="password"
+                                {...loginRegister('password')}
+                                error={loginErrors.password?.message}
+                                className="bg-black/50 border-gray-800 text-white placeholder-gray-600 focus:border-red-500/50 focus:bg-black transition-colors"
+                            />
+                        </div>
+
+                        <Button
+                            type="submit"
+                            className="w-full py-5 text-xs font-black uppercase tracking-[0.3em] mt-10 shadow-2xl shadow-red-600/10 bg-red-600 hover:bg-black hover:text-red-600 hover:border-red-600 border border-transparent transition-all duration-500 rounded-none"
+                            isLoading={loading}
+                        >
+                            {loading ? 'Initializing...' : 'Authorize Access'}
+                        </Button>
+                    </form>
+
+                    <div className="mt-10 pt-6 border-t border-gray-800">
+                        <p className="text-center text-gray-500/70 text-[10px] uppercase tracking-[0.2em] font-bold">
+                            Admins must be provisioned via system authority.
+                        </p>
+                        <p className="text-center text-gray-600/50 text-[10px] uppercase tracking-widest font-mono mt-2">
+                            IP Logged & Monitored
+                        </p>
+                    </div>
                 </div>
-
-                <form onSubmit={handleLoginSubmit(onLoginSubmit)} className="space-y-6">
-                    <Input
-                        label="System Email"
-                        icon={Mail}
-                        {...loginRegister('email')}
-                        error={loginErrors.email?.message}
-                        className="bg-gray-900 border-gray-800 text-white placeholder-gray-600 focus:border-red-500"
-                    />
-
-                    <Input
-                        label="Passphrase"
-                        icon={Lock}
-                        type="password"
-                        {...loginRegister('password')}
-                        error={loginErrors.password?.message}
-                        className="bg-gray-900 border-gray-800 text-white placeholder-gray-600 focus:border-red-500"
-                    />
-
-                    <Button type="submit" className="w-full py-6 rounded-2xl bg-red-600 hover:bg-red-700 text-white border-0 shadow-lg shadow-red-500/20" isLoading={loading}>
-                        Authenticate Identity
-                        <ArrowRight className="ml-2 w-5 h-5" />
-                    </Button>
-                </form>
-
-                <p className="text-center text-text-secondary text-[10px] mt-8 uppercase tracking-widest font-black">
-                    Admins must be provisioned via system authority.
-                </p>
             </div>
         </div>
     );

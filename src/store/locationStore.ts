@@ -67,14 +67,22 @@ export const useLocationStore = create<LocationState>()(
                         },
                         (err) => {
                             let message = 'Failed to detect location';
-                            if (err.code === err.PERMISSION_DENIED) message = 'Location permission denied. Please enter pincode manually.';
-                            else if (err.code === err.POSITION_UNAVAILABLE) message = 'Position unavailable (GPS signal lost)';
-                            else if (err.code === err.TIMEOUT) message = 'Location request timed out';
+                            if (err.code === err.PERMISSION_DENIED) {
+                                message = 'Location access blocked. Please enable permissions in your browser bar (top left) and refresh.';
+                            } else if (err.code === err.POSITION_UNAVAILABLE) {
+                                message = 'GPS Position unavailable. Try entering your pincode manually.';
+                            } else if (err.code === err.TIMEOUT) {
+                                message = 'Location request timed out. Please try again or enter pincode.';
+                            }
 
                             set({ error: message, isLoading: false });
                             resolve(false);
                         },
-                        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                        {
+                            enableHighAccuracy: true,
+                            timeout: 15000, // Increased to 15s for better reliability 
+                            maximumAge: 30000
+                        }
                     );
                 });
             },

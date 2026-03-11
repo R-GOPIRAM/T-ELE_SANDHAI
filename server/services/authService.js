@@ -88,7 +88,12 @@ class AuthService {
             throw new AppError('User not found', 404);
         }
 
-        const updatedUser = await UserRepository.updateUser(userId, { name: updateData.name });
+        const allowedUpdates = {};
+        if (updateData.name) allowedUpdates.name = updateData.name;
+        if (updateData.address) allowedUpdates.address = updateData.address;
+        if (updateData.phone) allowedUpdates.phone = updateData.phone;
+
+        const updatedUser = await UserRepository.updateUser(userId, allowedUpdates);
         return updatedUser;
     }
 

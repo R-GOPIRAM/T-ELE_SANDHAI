@@ -11,6 +11,7 @@ export default function ProductsPage() {
   // Query State
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedBrand, setSelectedBrand] = useState('');
   const [priceRange, setPriceRange] = useState({ min: '', max: '' });
   const [minRating, setMinRating] = useState(0);
   const [isBargainableOnly, setIsBargainableOnly] = useState(false);
@@ -38,12 +39,18 @@ export default function ProductsPage() {
   ], []);
 
   const sortOptions = useMemo(() => [
+    { value: 'popularity', label: 'Popularity' },
     { value: 'relevance', label: 'Best Match' },
     { value: 'price-low', label: 'Lowest Price' },
     { value: 'price-high', label: 'Highest Price' },
     { value: 'rating', label: 'Highest Rating' },
     { value: 'fastest-delivery', label: 'Fastest Delivery' }
   ], []);
+
+  const brands = useMemo(() => {
+    const uniqueBrands = new Set(products.map(p => p.brand).filter(Boolean));
+    return ['', ...Array.from(uniqueBrands)].sort();
+  }, [products]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -56,6 +63,7 @@ export default function ProductsPage() {
 
     if (searchTerm) params.search = searchTerm;
     if (selectedCategory) params.category = selectedCategory;
+    if (selectedBrand) params.brand = selectedBrand;
     if (priceRange.min) params.minPrice = priceRange.min;
     if (priceRange.max) params.maxPrice = priceRange.max;
     if (minRating > 0) params.rating = minRating;
@@ -72,10 +80,11 @@ export default function ProductsPage() {
       clearTimeout(timeoutId);
       controller.abort();
     };
-  }, [searchTerm, selectedCategory, priceRange.min, priceRange.max, sortBy, page, minRating, isBargainableOnly, fetchProducts]);
+  }, [searchTerm, selectedCategory, selectedBrand, priceRange.min, priceRange.max, sortBy, page, minRating, isBargainableOnly, fetchProducts]);
 
   const clearFilters = () => {
     setSelectedCategory('');
+    setSelectedBrand('');
     setPriceRange({ min: '', max: '' });
     setMinRating(0);
     setIsBargainableOnly(false);
@@ -100,6 +109,27 @@ export default function ProductsPage() {
                 }`}
             >
               {cat.name}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="border-t border-border" />
+
+      {/* Brands */}
+      <div>
+        <h3 className="text-sm font-bold text-text-primary uppercase tracking-wider mb-4">Brands</h3>
+        <div className="flex flex-col space-y-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
+          {brands.map(brand => (
+            <button
+              key={brand || 'all-brands'}
+              onClick={() => { setSelectedBrand(brand); setPage(1); }}
+              className={`text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${selectedBrand === brand
+                ? 'bg-primary/10 text-primary font-bold'
+                : 'text-text-secondary hover:bg-background hover:text-text-primary'
+                }`}
+            >
+              {brand || 'All Brands'}
             </button>
           ))}
         </div>
@@ -299,9 +329,10 @@ export default function ProductsPage() {
           </div>
 
           {/* Applied filters tags */}
-          {(searchTerm || selectedCategory || priceRange.min || priceRange.max || minRating > 0 || isBargainableOnly) && (
+          {(searchTerm || selectedCategory || selectedBrand || priceRange.min || priceRange.max || minRating > 0 || isBargainableOnly) && (
             <div className="flex flex-wrap gap-2 mb-6">
               {searchTerm && <Badge variant="outline" className="px-3 py-1 bg-card border border-border shadow-sm">"{searchTerm}" <X className="w-3 h-3 ml-2 cursor-pointer" onClick={() => { setSearchTerm(''); setPage(1) }} /></Badge>}
+              {selectedBrand && <Badge variant="outline" className="px-3 py-1 bg-card border border-border shadow-sm">{selectedBrand} <X className="w-3 h-3 ml-2 cursor-pointer" onClick={() => { setSelectedBrand(''); setPage(1) }} /></Badge>}
               {isBargainableOnly && <Badge variant="bargain" className="px-3 py-1 shadow-sm text-white">Bargainable <X className="w-3 h-3 ml-2 cursor-pointer" onClick={() => { setIsBargainableOnly(false); setPage(1) }} /></Badge>}
               {minRating > 0 && <Badge variant="warning" className="px-3 py-1 shadow-sm bg-warning/10 text-warning">{minRating}+ Stars <X className="w-3 h-3 ml-2 cursor-pointer" onClick={() => { setMinRating(0); setPage(1) }} /></Badge>}
               {(priceRange.min || priceRange.max) && <Badge variant="outline" className="px-3 py-1 bg-card border border-border shadow-sm">₹{priceRange.min || '0'} - ₹{priceRange.max || 'Any'} <X className="w-3 h-3 ml-2 cursor-pointer" onClick={() => { setPriceRange({ min: '', max: '' }); setPage(1) }} /></Badge>}

@@ -2,34 +2,42 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap');
+
 @layer base {
   body {
-    @apply antialiased text-text-primary bg-background selection:bg-primary selection:text-white font-sans;
+    @apply antialiased text-text-primary bg-background selection:bg-primary-light selection:text-primary font-sans overflow-x-hidden;
   }
 
   /* Typography Hierarchy */
   h1 {
-    @apply text-[52px] font-heading font-bold tracking-tight text-text-primary leading-tight;
+    @apply text-5xl md:text-6xl lg:text-7xl font-heading font-extrabold tracking-tight text-text-primary leading-[1.1];
   }
 
   h2 {
-    @apply text-[32px] font-heading font-semibold tracking-tight text-text-primary leading-tight;
+    @apply text-3xl md:text-4xl font-heading font-bold tracking-tight text-text-primary leading-tight;
   }
 
   h3 {
-    @apply text-[22px] font-heading font-semibold text-text-primary leading-snug;
+    @apply text-2xl md:text-3xl font-heading font-semibold text-text-primary leading-snug;
   }
 
   h4 {
-    @apply text-[18px] font-heading font-semibold text-text-primary leading-snug;
+    @apply text-xl font-heading font-semibold text-text-primary leading-snug;
   }
 
   p {
-    @apply font-sans text-[15px] leading-relaxed text-text-secondary;
+    @apply font-sans text-base leading-relaxed text-text-secondary;
   }
 
   .text-small {
-    @apply text-[14px] text-text-secondary;
+    @apply text-sm text-text-secondary;
+  }
+
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
   }
 }
 
@@ -37,85 +45,75 @@
 
   /* Buttons */
   .btn-primary {
-    @apply bg-primary text-white rounded-lg font-medium transition-all duration-300 hover:bg-primary-hover hover:scale-[1.02] shadow-sm hover:shadow-lg active:scale-95;
+    @apply bg-primary text-white rounded-xl font-semibold transition-all duration-300 hover:bg-primary-hover hover:-translate-y-0.5 shadow-md shadow-primary/20 hover:shadow-primary/40 active:scale-95 flex items-center justify-center gap-2 px-6 py-3;
   }
 
   .btn-bargain {
-    @apply bg-bargain text-white rounded-lg font-medium transition-all duration-300 hover:bg-bargain-hover hover:scale-[1.02] shadow-sm hover:shadow-lg active:scale-95;
+    @apply bg-bargain text-white rounded-xl font-semibold transition-all duration-300 hover:bg-bargain-hover hover:-translate-y-0.5 shadow-md shadow-bargain/20 hover:shadow-bargain/40 active:scale-95 flex items-center justify-center gap-2 px-6 py-3;
   }
 
   .btn-seller {
-    @apply bg-seller text-white rounded-lg font-medium transition-all duration-300 hover:bg-seller-hover hover:scale-[1.02] shadow-sm hover:shadow-lg active:scale-95;
+    @apply bg-seller text-white rounded-xl font-semibold transition-all duration-300 hover:bg-seller-hover hover:-translate-y-0.5 shadow-md shadow-seller/20 hover:shadow-seller/40 active:scale-95 flex items-center justify-center gap-2 px-6 py-3;
   }
 
   /* Badges */
   .badge-bargain {
-    @apply bg-bargain text-white text-xs px-3 py-1 font-bold rounded-md shadow-sm;
+    @apply bg-bargain/10 text-bargain text-xs px-3 py-1 font-bold rounded-full border border-bargain/20 inline-flex items-center gap-1;
   }
 
   .badge-seller {
-    @apply bg-seller text-white text-xs px-3 py-1 font-bold rounded-md shadow-sm;
+    @apply bg-seller/10 text-seller text-xs px-3 py-1 font-bold rounded-full border border-seller/20 inline-flex items-center gap-1;
+  }
+
+  .badge-primary {
+    @apply bg-primary/10 text-primary text-xs px-3 py-1 font-bold rounded-full border border-primary/20 inline-flex items-center gap-1;
   }
 
   /* Cards */
   .card {
-    @apply bg-card border border-border rounded-xl shadow-sm p-5 transition-all duration-300 hover:shadow-lg;
+    @apply bg-card border border-border/60 rounded-2xl shadow-soft p-5 transition-all duration-300;
   }
 
   .card-hover-lift {
-    @apply transition-all duration-300 hover:-translate-y-[6px] hover:shadow-lg border border-border rounded-xl;
+    @apply bg-card border border-border/60 rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:border-primary/20 relative overflow-hidden;
+  }
+
+  .glass-panel {
+    @apply bg-card/80 backdrop-blur-xl border border-white/20 shadow-glass rounded-2xl;
   }
 
   .section-title {
-    @apply text-[32px] font-heading font-semibold text-text-primary mb-8;
+    @apply text-3xl md:text-4xl font-heading font-extrabold text-text-primary mb-8 tracking-tight;
   }
 
   .section-container {
-    @apply py-[80px] max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+    @apply py-16 md:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
   @apply bg-background;
-  border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-border;
-  border-radius: 10px;
-  border: 2px solid;
-  @apply border-background;
+  @apply bg-border-dark/30 hover:bg-border-dark/50 rounded-full transition-colors;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-text-secondary;
+/* Utilities for hiding scrollbar visually but keeping functionality */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
-/* Premium Animations */
-@keyframes shimmer {
-  100% {
-    transform: translateX(100%);
-  }
-}
-
-.animate-fade-in-up {
-  animation: fade-in-up 0.6s ease-out forwards;
-}
-
-@keyframes fade-in-up {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari and Opera */
 }

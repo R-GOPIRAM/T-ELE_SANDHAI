@@ -4,6 +4,7 @@ import {
     ShoppingCart,
     Package,
     User,
+    Users,
     Store,
     LayoutDashboard,
     Truck,
@@ -29,26 +30,30 @@ export const CUSTOMER_NAV = [
     { name: 'My Orders', href: '/dashboard/orders', icon: Package },
     { name: 'Wishlist', href: '/dashboard/wishlist', icon: Heart },
     { name: 'Bargain History', href: '/dashboard/bargains', icon: History },
-    { name: 'Profile', href: '/dashboard/profile', icon: User },
-    { name: 'Addresses', href: '/dashboard/addresses', icon: MapPin },
+    { name: 'Profile', href: '/dashboard', icon: User, end: true },
+    { name: 'Addresses', href: '/dashboard', icon: MapPin, end: true },
     { name: 'Settings', href: '/dashboard/settings', icon: Settings },
 ];
 
 export const SELLER_NAV = [
     { name: 'Overview', href: '/dashboard/seller', icon: LayoutDashboard, end: true },
     { name: 'Add Product', href: '/dashboard/seller/add-product', icon: Package },
-    { name: 'My Inventory', href: '/dashboard/products', icon: Store },
+    { name: 'My Inventory', href: '/dashboard/seller', icon: Store },
     { name: 'Orders', href: '/dashboard/seller/orders', icon: Package },
     { name: 'Bargain Requests', href: '/dashboard/bargains', icon: MessageSquare },
     { name: 'Verification', href: '/dashboard/seller/verification', icon: ShieldCheck },
-    { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
+    { name: 'Analytics', href: '/dashboard/seller', icon: BarChart3 },
     { name: 'Settings', href: '/dashboard/settings', icon: Settings },
 ];
 
 export const ADMIN_NAV = [
-    { name: 'Overview', href: '/admin/logistics', icon: LayoutDashboard, end: true },
+    { name: 'Overview', href: '/admin', icon: LayoutDashboard, end: true },
+    { name: 'Users', href: '/admin/users', icon: Users },
+    { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
     { name: 'Stores', href: '/admin/stores', icon: Store },
+    { name: 'Seller Approvals', href: '/admin/seller-approval', icon: ShieldCheck },
     { name: 'Logistics', href: '/admin/logistics', icon: Truck },
+    { name: 'Review Moderation', href: '/admin/reviews', icon: MessageSquare },
     { name: 'Settings', href: '/admin/settings', icon: Settings },
 ];
 

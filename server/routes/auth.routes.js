@@ -7,8 +7,8 @@ const loginLimiter = require('../middleware/loginLimiter');
 
 const router = express.Router();
 
-router.post('/register/customer', validate(registerCustomerSchema || registerSchema), authController.registerCustomer);
-router.post('/register/seller', validate(registerSellerSchema || registerSchema), authController.registerSeller);
+router.post('/register/customer', validate(registerCustomerSchema), authController.registerCustomer);
+router.post('/register/seller', validate(registerSellerSchema), authController.registerSeller);
 router.post('/login', loginLimiter, validate(loginSchema), authController.login);
 router.post('/refresh', authController.refresh);
 router.post('/logout', protect, authController.logout);

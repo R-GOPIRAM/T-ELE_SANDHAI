@@ -71,6 +71,27 @@ class ReviewService {
         await review.save();
         return review;
     }
+
+    async getAllReviews(queryParams) {
+        const { page = 1, limit = 20, status } = queryParams;
+        return await ReviewRepository.findAll(page, limit, status);
+    }
+
+    async updateReviewStatus(reviewId, isApproved) {
+        const review = await ReviewRepository.updateStatus(reviewId, isApproved);
+        if (!review) {
+            throw new AppError('Review not found', 404);
+        }
+        return review;
+    }
+
+    async deleteReview(reviewId) {
+        const review = await ReviewRepository.findById(reviewId);
+        if (!review) {
+            throw new AppError('Review not found', 404);
+        }
+        await review.deleteOne();
+    }
 }
 
 module.exports = new ReviewService();

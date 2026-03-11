@@ -71,3 +71,12 @@ exports.updatePaymentStatus = catchAsync(async (req, res) => {
 
     return sendResponse(res, 200, true, 'Payment status updated successfully', order);
 });
+
+exports.updateOrderStatus = catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const order = await OrderService.updateOrderStatus(id, req.user._id.toString(), req.user.role, status);
+
+    return sendResponse(res, 200, true, 'Order status updated successfully', order);
+});

@@ -61,6 +61,9 @@ export default function MyOrdersPage() {
           ...o,
           id: String(o.orderId || o.id || o._id || 'unknown'),
           status: (o.orderStatus || o.status || 'pending').toLowerCase(),
+          deliveryAddress: o.shippingAddress
+            ? `${o.shippingAddress.street || ''}, ${o.shippingAddress.city || ''}, ${o.shippingAddress.state || ''} ${o.shippingAddress.zipCode || ''}`.trim().replace(/^,\s*/, '')
+            : undefined,
           /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
           items: o.items.map((i: Record<string, any>) => ({
             ...i,
@@ -170,7 +173,7 @@ export default function MyOrdersPage() {
               </div>
             ) : (
               filteredOrders.map((order) => {
-                const style = getStatusStyle(order.status);
+                const style = getStatusStyle(order.status ?? order.orderStatus.toLowerCase());
                 const isSelected = selectedOrder?.id === order.id;
 
                 return (
@@ -259,11 +262,11 @@ export default function MyOrdersPage() {
                     <section>
                       <div className="flex items-center justify-between mb-4">
                         <p className="text-[10px] font-black text-text-secondary uppercase tracking-widest">Progress Vector</p>
-                        <p className={`text-[10px] font-black uppercase tracking-widest ${getStatusStyle(selectedOrder.status).text}`}>{selectedOrder.status}</p>
+                        <p className={`text-[10px] font-black uppercase tracking-widest ${getStatusStyle(selectedOrder.status ?? selectedOrder.orderStatus.toLowerCase()).text}`}>{selectedOrder.status ?? selectedOrder.orderStatus.toLowerCase()}</p>
                       </div>
                       <div className="grid grid-cols-4 gap-2">
                         {['pending', 'confirmed', 'shipped', 'delivered'].map((s, idx, arr) => {
-                          const orderIdx = arr.indexOf(selectedOrder.status);
+                          const orderIdx = arr.indexOf(selectedOrder.status ?? selectedOrder.orderStatus.toLowerCase());
                           const isCompleted = orderIdx >= idx;
                           return (
                             <div key={s} className={`h-1.5 rounded-full transition-all duration-700 ${isCompleted ? 'bg-primary' : 'bg-background'}`} />
@@ -304,7 +307,7 @@ export default function MyOrdersPage() {
                               <p className="text-[9px] text-text-secondary font-bold uppercase tracking-widest">Qty: {item.quantity} units</p>
                             </div>
                             <div className="text-right">
-                              <p className="font-black text-text-primary">₹{item.subtotal.toLocaleString('en-IN')}</p>
+                              <p className="font-black text-text-primary">₹{(item.subtotal ?? item.price * item.quantity).toLocaleString('en-IN')}</p>
                             </div>
                           </div>
                         ))}

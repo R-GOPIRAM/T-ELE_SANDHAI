@@ -27,6 +27,7 @@ router.post(
 
 router.get('/profile', protect, restrictTo('seller', 'admin'), sellerController.getProfile);
 router.get('/store/:id', sellerController.getStoreProfile); // Public route for store profiles
+router.get('/nearby', sellerController.getNearbyStores); // Proximity search
 router.get('/admin/all', protect, restrictTo('admin'), sellerController.getAllSellers);
 router.patch('/:id/verify', protect, restrictTo('admin'), validate(verifySellerSchema), sellerController.verifySeller);
 

@@ -4,7 +4,13 @@ export interface User {
   name: string;
   role: 'customer' | 'seller' | 'admin';
   phone?: string;
-  address?: string;
+  address?: {
+    street?: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
+    country?: string;
+  };
 }
 
 export interface Seller extends User {
@@ -80,16 +86,30 @@ export interface CartItem {
 
 export interface Order {
   id: string;
-  customerId: string;
-  customerName: string;
-  customerEmail: string;
-  customerPhone: string;
+  _id: string;
+  orderId: string;
+  user: string | User;
   items: OrderItem[];
   totalAmount: number;
+  shippingAddress: {
+    street: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    country: string;
+    phone: string;
+  };
+  /** Normalized lowercase status set after API response mapping */
+  status?: string;
+  /** Human-readable delivery address string set after API response mapping */
   deliveryAddress?: string;
   deliveryType: 'pickup' | 'delivery';
-  paymentMethod: string;
-  status: 'pending' | 'confirmed' | 'packed' | 'shipped' | 'delivered' | 'cancelled';
+  paymentMethod?: string;
+  paymentInfo?: {
+    status: string;
+    method: string;
+  };
+  orderStatus: 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
   createdAt: string;
   updatedAt: string;
   estimatedDelivery?: string;
@@ -98,13 +118,20 @@ export interface Order {
 }
 
 export interface OrderItem {
-  productId: string;
-  sellerId: string;
-  productName: string;
-  sellerName: string;
+  product: string | Product;
+  seller: string | User;
+  name: string;
+  /** Resolved product name set after API response mapping */
+  productName?: string;
+  /** Seller display name set after API response mapping */
+  sellerName?: string;
+  /** Seller ID string set after API response mapping */
+  sellerId?: string;
+  /** Computed subtotal (price * quantity) set after API response mapping */
+  subtotal?: number;
+  image?: string;
   quantity: number;
   price: number;
-  subtotal: number;
 }
 
 export type NotificationType = 'success' | 'error' | 'warning' | 'info';

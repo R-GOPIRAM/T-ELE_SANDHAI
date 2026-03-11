@@ -16,14 +16,11 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 
 const CATEGORIES = [
-  { name: 'Smartphones', icon: Smartphone, color: 'bg-blue-100 text-blue-600' },
-  { name: 'Laptops & PCs', icon: Laptop, color: 'bg-indigo-100 text-indigo-600' },
-  { name: 'Audio', icon: Headphones, color: 'bg-purple-100 text-purple-600' },
-  { name: 'Wearables', icon: Watch, color: 'bg-pink-100 text-pink-600' },
-  { name: 'Gaming', icon: Gamepad, color: 'bg-red-100 text-danger' },
-  { name: 'Televisions', icon: Tv, color: 'bg-bargain/20 text-bargain-hover' },
-  { name: 'Smart Home', icon: Speaker, color: 'bg-teal-100 text-teal-600' },
-  { name: 'Accessories', icon: Zap, color: 'bg-yellow-100 text-yellow-600' },
+  { name: 'Mobiles', icon: Smartphone, query: 'category=Smartphones' },
+  { name: 'Laptops', icon: Laptop, query: 'category=Laptops' },
+  { name: 'Accessories', icon: Headphones, query: 'category=Accessories' },
+  { name: 'TVs', icon: Tv, query: 'category=Televisions' },
+  { name: 'Smart Devices', icon: Speaker, query: 'category=Smart%20Home' },
 ];
 
 const FEATURED_SELLERS = [
@@ -32,6 +29,9 @@ const FEATURED_SELLERS = [
   { name: 'Gadget Galaxy', location: 'Velachery', rating: 4.7, type: 'Mobiles & Accessories', image: 'https://images.unsplash.com/photo-1512428559087-560fa5ceab42?w=400&h=400&fit=crop' },
   { name: 'Smart Home Depot', location: 'Mylapore', rating: 4.6, type: 'Home Appliances', image: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=400&h=400&fit=crop' }
 ];
+
+import { ProductCardSkeleton } from '../components/ui/Skeleton';
+import SearchBar from '../features/search/SearchBar';
 
 export default function HomePage() {
   // useCart logic removed or updated in Phase 5
@@ -109,59 +109,39 @@ export default function HomePage() {
                 transition={{ duration: 0.8, ease: "easeOut" }}
               >
                 <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full border border-primary/20 mb-8 shadow-sm">
-                  <Badge variant="primary" className="bg-primary text-white border-none py-1">New</Badge>
-                  <span className="text-sm font-black text-primary uppercase tracking-widest">Connect Directly with Local Stores</span>
+                  <Badge variant="primary" className="bg-primary text-white border-none py-1">Hyperlocal</Badge>
+                  <span className="text-sm font-black text-primary uppercase tracking-widest">Electronics Marketplace</span>
                 </div>
 
                 <h1 className="text-5xl sm:text-6xl lg:text-7xl font-heading font-black text-text-primary tracking-tighter leading-[1.1] mb-8">
-                  Support Your <span className="text-primary">Local</span> <br />
+                  Get <span className="text-primary">Gear</span> from <br />
                   <span className="relative inline-block mt-2">
-                    Electronics
+                    Nearby Stores.
                     <svg className="absolute -bottom-2 left-0 w-full h-3 text-bargain -z-10 opacity-60" viewBox="0 0 100 10" preserveAspectRatio="none">
                       <path d="M0 5 Q 25 0, 50 5 T 100 5" fill="none" stroke="currentColor" strokeWidth="8" strokeLinecap="round" />
                     </svg>
-                  </span> Sandhai.
+                  </span>
                 </h1>
 
                 <p className="text-xl text-text-secondary mb-10 max-w-2xl mx-auto lg:mx-0 font-medium leading-relaxed">
-                  Real products. Real store owners. Real-time bargaining.
-                  Bringing the authentic neighborhood shopping experience to your screen.
+                  Connect with verified local retailers. Search electronics near you and get authentic products with live bargaining options.
                 </p>
 
-                <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-10">
-                  <Button
-                    size="lg"
-                    className="w-full sm:w-auto text-lg px-8 py-6 rounded-[2rem] shadow-2xl shadow-primary/30 font-black tracking-tight"
-                    onClick={() => navigate('/products')}
-                  >
-                    Start Exploring Gear
-                  </Button>
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="w-full sm:w-auto text-lg px-8 py-6 rounded-[2rem] border-2 font-black tracking-tight bg-card/50 backdrop-blur-md"
-                    onClick={() => {
-                      const elem = document.getElementById('stores');
-                      elem?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }}
-                  >
-                    Find Nearby Shops
-                  </Button>
+                <div className="max-w-xl mx-auto lg:mx-0 mb-12">
+                  <SearchBar />
                 </div>
 
-                <div className="flex items-center justify-center lg:justify-start gap-8 border-t border-border pt-8">
-                  <div className="text-center lg:text-left">
-                    <p className="text-3xl font-black text-text-primary mb-1">120+</p>
-                    <p className="text-xs uppercase font-bold text-text-secondary tracking-widest">Local Stores</p>
-                  </div>
-                  <div className="text-center lg:text-left">
-                    <p className="text-3xl font-black text-text-primary mb-1">5000+</p>
-                    <p className="text-xs uppercase font-bold text-text-secondary tracking-widest">Products</p>
-                  </div>
-                  <div className="text-center lg:text-left">
-                    <p className="text-3xl font-black text-primary mb-1">Live</p>
-                    <p className="text-xs uppercase font-bold text-text-secondary tracking-widest">Bargaining</p>
-                  </div>
+                <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4">
+                  {CATEGORIES.map((cat, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => navigate(`/products?${cat.query}`)}
+                      className="flex items-center gap-2 px-6 py-3 bg-white/5 border border-border hover:border-primary hover:bg-primary/5 rounded-full transition-all group"
+                    >
+                      <cat.icon className="w-4 h-4 text-primary" />
+                      <span className="text-xs font-bold text-text-secondary group-hover:text-primary">{cat.name}</span>
+                    </button>
+                  ))}
                 </div>
               </motion.div>
             </div>
@@ -234,53 +214,37 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 2. Top Stores Near You (Horizontal Scroll) */}
-      <section id="stores" className="py-20 bg-background border-b border-border overflow-hidden">
+      {/* 2. Top Stores Near You */}
+      <section id="stores" className="py-24 bg-background border-b border-border overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row items-center justify-between mb-10 gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between mb-16 gap-4 text-center sm:text-left">
             <div>
-              <h2 className="text-3xl font-heading font-extrabold text-text-primary tracking-tight">
-                Premium Local Retailers
+              <h2 className="text-4xl font-heading font-black text-text-primary tracking-tighter">
+                Popular <span className="text-primary">Stores</span> Nearby
               </h2>
-              <p className="text-text-secondary mt-2 font-medium">Verified authrozed dealers in your area.</p>
+              <p className="text-text-secondary mt-2 font-medium">Verified authorized dealers in your immediate vicinity.</p>
             </div>
           </div>
 
-          <div className="flex overflow-x-auto hide-scrollbar gap-6 pb-4 sm:-mx-0 snap-x">
-            {FEATURED_SELLERS.map((seller, idx) => (
-              <div key={idx} className="flex-shrink-0 w-80 snap-start">
-                <StoreCard
-                  name={seller.name}
-                  rating={seller.rating}
-                  location={seller.location}
-                  logoUrl={seller.image}
-                  productCount={Math.floor(Math.random() * 50) + 10}
-                  onClick={() => navigate('/products')}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 3. Shop Categories */}
-      <section className="py-24 bg-card">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-heading font-black text-text-primary tracking-tighter">
-              Explore Urban <span className="text-primary">Categories</span>
-            </h2>
-            <p className="text-text-secondary mt-2 font-medium">Browse thousands of products available in local shops right now.</p>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4 sm:gap-6">
-            {CATEGORIES.map((cat, idx) => (
-              <CategoryCard
-                key={idx}
-                name={cat.name}
-                icon={cat.icon}
-                onClick={() => navigate('/products')}
-              />
-            ))}
+          <div className="flex overflow-x-auto hide-scrollbar gap-8 pb-4 snap-x">
+            {loading ? (
+              [1, 2, 3, 4].map(i => (
+                <div key={i} className="flex-shrink-0 w-80 h-48 bg-border/20 animate-pulse rounded-[2.5rem]"></div>
+              ))
+            ) : (
+              FEATURED_SELLERS.map((seller, idx) => (
+                <div key={idx} className="flex-shrink-0 w-80 snap-start">
+                  <StoreCard
+                    name={seller.name}
+                    rating={seller.rating}
+                    location={seller.location}
+                    logoUrl={seller.image}
+                    productCount={Math.floor(Math.random() * 50) + 10}
+                    onClick={() => navigate('/products')}
+                  />
+                </div>
+              ))
+            )}
           </div>
         </div>
       </section>
@@ -288,19 +252,19 @@ export default function HomePage() {
       {/* 4. Trending Products Grid */}
       <section className="py-20 bg-background border-border relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row items-center justify-between mb-10 gap-4">
-            <h2 className="text-3xl font-heading font-extrabold text-text-primary tracking-tight flex items-center gap-3">
-              Trending Right Now
+          <div className="flex flex-col sm:flex-row items-center justify-between mb-16 gap-4 text-center sm:text-left">
+            <h2 className="text-4xl font-heading font-black text-text-primary tracking-tighter flex items-center gap-4">
+              Trending <span className="text-primary">Near You</span>
             </h2>
-            <Button variant="ghost" onClick={() => navigate('/products')} className="text-primary font-bold hover:bg-primary/10">
-              View All Products <ArrowRight className="w-4 h-4 ml-2" />
+            <Button variant="ghost" onClick={() => navigate('/products')} className="text-primary font-bold hover:bg-primary/10 rounded-full px-6">
+              View Gear <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </div>
 
           {loading ? (
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
-                <div key={i} className="h-80 bg-border/30 animate-pulse rounded-xl"></div>
+                <ProductCardSkeleton key={i} />
               ))}
             </div>
           ) : trendingProducts.length > 0 ? (
@@ -326,16 +290,22 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-16">
-            <Badge variant="bargain" className="mb-4 text-white">Live Negotiation</Badge>
-            <h2 className="text-4xl md:text-5xl font-heading font-extrabold text-text-primary tracking-tight mb-4">
-              Bargain Like A Local.
+            <Badge variant="bargain" className="mb-6 px-4 py-1.5 rounded-full text-white">Live Negotiation</Badge>
+            <h2 className="text-4xl md:text-5xl font-heading font-black text-text-primary tracking-tighter mb-4">
+              Best <span className="text-primary">Deals</span> Nearby.
             </h2>
-            <p className="text-lg md:text-xl text-text-secondary max-w-2xl mx-auto font-medium">
-              Select retailers on T-ELE Sandhai accept direct offers. Spot the bargain tag, chat directly with the store owner, and lock in the best price.
+            <p className="text-lg md:text-xl text-text-secondary max-w-2xl mx-auto font-medium leading-relaxed">
+              Spot the bargain tag, chat directly with store owners, and lock in the best price in your neighborhood.
             </p>
           </div>
 
-          {loading ? null : bargainProducts.length > 0 ? (
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+              {[1, 2, 3, 4].map(i => (
+                <ProductCardSkeleton key={i} />
+              ))}
+            </div>
+          ) : bargainProducts.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {bargainProducts.map((product: Product) => (
                 <ProductCard
@@ -420,34 +390,34 @@ export default function HomePage() {
           <h2 className="text-3xl font-heading font-extrabold text-text-primary tracking-tight mb-12">
             Trusted by Local Communities
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <div className="flex flex-col items-center">
-              <div className="w-16 h-16 bg-seller/10 rounded-full flex items-center justify-center text-seller mb-4">
-                <ShieldCheck className="w-8 h-8" />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
+            <div className="flex flex-col items-center group">
+              <div className="w-20 h-20 bg-seller/10 rounded-3xl flex items-center justify-center text-seller mb-6 border border-seller/20 shadow-inner group-hover:scale-110 transition-transform">
+                <ShieldCheck className="w-10 h-10" />
               </div>
-              <h4 className="text-3xl font-black text-text-primary">100%</h4>
-              <p className="text-xs uppercase font-bold text-text-secondary tracking-widest mt-1">Verified Sellers</p>
+              <h4 className="text-4xl font-heading font-black text-text-primary">100%</h4>
+              <p className="text-[10px] uppercase font-black text-text-secondary tracking-[0.2em] mt-2">Verified Nodes</p>
             </div>
-            <div className="flex flex-col items-center">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-4">
-                <Store className="w-8 h-8" />
+            <div className="flex flex-col items-center group">
+              <div className="w-20 h-20 bg-primary/10 rounded-3xl flex items-center justify-center text-primary mb-6 border border-primary/20 shadow-inner group-hover:scale-110 transition-transform">
+                <Store className="w-10 h-10" />
               </div>
-              <h4 className="text-3xl font-black text-text-primary">120+</h4>
-              <p className="text-xs uppercase font-bold text-text-secondary tracking-widest mt-1">Stores</p>
+              <h4 className="text-4xl font-heading font-black text-text-primary">240+</h4>
+              <p className="text-[10px] uppercase font-black text-text-secondary tracking-[0.2em] mt-2">Active Hubs</p>
             </div>
-            <div className="flex flex-col items-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 mb-4">
-                <ShoppingBag className="w-8 h-8" />
+            <div className="flex flex-col items-center group">
+              <div className="w-20 h-20 bg-bargain/10 rounded-3xl flex items-center justify-center text-bargain mb-6 border border-bargain/20 shadow-inner group-hover:scale-110 transition-transform">
+                <ShoppingBag className="w-10 h-10" />
               </div>
-              <h4 className="text-3xl font-black text-text-primary">5000+</h4>
-              <p className="text-xs uppercase font-bold text-text-secondary tracking-widest mt-1">Products</p>
+              <h4 className="text-4xl font-heading font-black text-text-primary">8.5k</h4>
+              <p className="text-[10px] uppercase font-black text-text-secondary tracking-[0.2em] mt-2">Gear Units</p>
             </div>
-            <div className="flex flex-col items-center">
-              <div className="w-16 h-16 bg-bargain/10 rounded-full flex items-center justify-center text-bargain mb-4">
-                <MessageSquare className="w-8 h-8" />
+            <div className="flex flex-col items-center group">
+              <div className="w-20 h-20 bg-warning/10 rounded-3xl flex items-center justify-center text-warning mb-6 border border-warning/20 shadow-inner group-hover:scale-110 transition-transform">
+                <MessageSquare className="w-10 h-10" />
               </div>
-              <h4 className="text-3xl font-black text-text-primary">Live</h4>
-              <p className="text-xs uppercase font-bold text-text-secondary tracking-widest mt-1">Bargaining</p>
+              <h4 className="text-4xl font-heading font-black text-text-primary tracking-tighter shrink-0">Live Deal</h4>
+              <p className="text-[10px] uppercase font-black text-text-secondary tracking-[0.2em] mt-2 text-center">Open Negotiation</p>
             </div>
           </div>
         </div>

@@ -4,8 +4,9 @@ const analyticsController = require('../controllers/analyticsController');
 const { protect, restrictTo } = require('../middleware/authMiddleware');
 
 router.use(protect);
-router.use(restrictTo('seller', 'admin'));
 
-router.get('/seller', analyticsController.getSellerAnalytics);
+router.get('/seller', restrictTo('seller', 'admin'), analyticsController.getSellerAnalytics);
+router.get('/admin', restrictTo('admin'), analyticsController.getAdminOverview);
+router.get('/admin/reports', restrictTo('admin'), analyticsController.getAdminAnalytics);
 
 module.exports = router;

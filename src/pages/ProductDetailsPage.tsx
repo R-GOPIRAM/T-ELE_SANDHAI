@@ -83,16 +83,17 @@ export default function ProductDetailPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
-        <div className="bg-card p-8 rounded-3xl shadow-xl border border-border text-center max-w-md">
-          <div className="w-20 h-20 bg-danger-50 text-danger-600 rounded-full flex items-center justify-center mx-auto mb-6">
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 relative overflow-hidden">
+        <div className="absolute top-1/4 -left-1/4 w-[600px] h-[600px] bg-danger/10 rounded-full blur-[120px] animate-pulse-slow -z-10" />
+        <div className="glass-panel p-10 text-center max-w-md relative z-10">
+          <div className="w-20 h-20 bg-danger/10 text-danger rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-danger/20">
             <Info className="w-10 h-10" />
           </div>
-          <h2 className="text-2xl font-extrabold text-text-primary mb-2">Something Went Wrong</h2>
-          <p className="text-text-secondary mb-8">{error}</p>
+          <h2 className="text-2xl font-black text-text-primary mb-2">Service Offline</h2>
+          <p className="text-text-secondary mb-8 font-medium">{error}</p>
           <div className="flex gap-4">
-            <Button className="flex-1" onClick={() => navigate('/products')}>Go Back</Button>
-            <Button variant="outline" className="flex-1" onClick={() => window.location.reload()}>Retry</Button>
+            <Button className="flex-1 py-4 font-bold" onClick={() => navigate('/products')}>Return Home</Button>
+            <Button variant="outline" className="flex-1 py-4 font-bold" onClick={() => window.location.reload()}>Try Again</Button>
           </div>
         </div>
       </div>
@@ -131,10 +132,10 @@ export default function ProductDetailPage() {
           {/* LEFT COLUMN: Gallery */}
           <div className="lg:col-span-7">
             <div className="bg-card rounded-3xl shadow-sm border border-border p-4 sm:p-8 flex flex-col items-center xl:sticky xl:top-28">
-              <div className="w-full relative rounded-2xl overflow-hidden bg-background mb-6 group aspect-square max-h-[600px] flex items-center justify-center">
+              <div className="w-full relative rounded-3xl overflow-hidden bg-background mb-8 group aspect-square max-h-[600px] flex items-center justify-center border border-border/30 shadow-inner">
                 {product.originalPrice && (
-                  <div className="absolute top-4 left-4 z-10 bg-danger-500 text-white px-3 py-1.5 rounded-full text-sm font-bold shadow-lg shadow-red-500/30">
-                    {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF
+                  <div className="absolute top-6 left-6 z-10 bg-danger text-white px-4 py-2 rounded-2xl text-sm font-black shadow-xl shadow-danger/30 transform -rotate-2 group-hover:rotate-0 transition-transform">
+                    {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% DISCOUNT
                   </div>
                 )}
                 <AnimatePresence mode="wait">
@@ -158,9 +159,9 @@ export default function ProductDetailPage() {
                     <button
                       key={index}
                       onClick={() => setSelectedImage(index)}
-                      className={`w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 rounded-xl overflow-hidden border-2 transition-all duration-300 ${selectedImage === index
-                        ? 'border-primary shadow-md ring-2 ring-primary-600/20 ring-offset-2 scale-105'
-                        : 'border-transparent bg-background hover:bg-background hover:border-border'
+                      className={`w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 rounded-2xl overflow-hidden border-2 transition-all duration-300 ${selectedImage === index
+                        ? 'border-primary shadow-xl ring-4 ring-primary/10 scale-105'
+                        : 'border-transparent bg-white hover:bg-white hover:border-border'
                         }`}
                     >
                       <img src={image} alt={`Thumbnail ${index + 1}`} className="w-full h-full object-cover mix-blend-multiply" />
@@ -176,47 +177,47 @@ export default function ProductDetailPage() {
             <div className="bg-card rounded-3xl shadow-xl shadow-border/50 border border-border p-6 sm:p-8 shrink-0 relative lg:sticky lg:top-28">
 
               {/* Brand & Title */}
-              <div className="mb-2 text-sm font-bold text-primary tracking-wider uppercase">{product.brand}</div>
-              <h1 className="text-3xl sm:text-4xl font-extrabold text-text-primary mb-4 leading-tight">{product.name}</h1>
+              <div className="mb-3 text-[10px] font-black text-primary tracking-[0.2em] uppercase bg-primary/10 w-fit px-3 py-1 rounded-full">{product.brand}</div>
+              <h1 className="text-4xl sm:text-5xl font-heading font-black text-text-primary mb-6 leading-[1.1] tracking-tight">{product.name}</h1>
 
               {/* Ratings */}
-              <div className="flex items-center gap-3 mb-6">
-                <div className="flex items-center bg-accent-50 px-3 py-1 rounded-full border border-accent-200">
-                  <span className="font-bold text-accent-700 mr-1">{product.rating || 'New'}</span>
-                  <Star className="w-4 h-4 text-accent-500 fill-current" />
+              <div className="flex items-center gap-4 mb-8">
+                <div className="flex items-center bg-warning/10 px-4 py-1.5 rounded-2xl border border-warning/20">
+                  <span className="font-black text-warning mr-1.5">{product.rating || 'New'}</span>
+                  <Star className="w-4 h-4 text-warning fill-current" />
                 </div>
-                <span className="text-text-secondary font-medium underline decoration-gray-300 underline-offset-4 cursor-pointer hover:text-primary">
-                  {product.reviewCount || 0} Ratings
+                <span className="text-text-secondary font-bold text-sm underline decoration-border underline-offset-8 cursor-pointer hover:text-primary transition-colors">
+                  {product.reviewCount || 0} Professional Reviews
                 </span>
               </div>
 
               {/* Price Block */}
-              <div className="mb-8 p-6 bg-gradient-to-br from-primary-50 to-indigo-50 border border-primary/20 rounded-2xl relative overflow-hidden">
-                <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary-500/10 rounded-full blur-xl"></div>
+              <div className="mb-8 p-8 bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20 rounded-[2rem] relative overflow-hidden shadow-sm">
+                <div className="absolute -right-6 -top-6 w-32 h-32 bg-primary/10 rounded-full blur-[40px] animate-pulse-slow"></div>
 
                 {product.originalPrice && (
-                  <div className="text-text-secondary font-medium text-lg line-through decoration-2 decoration-danger-400 mb-1">
+                  <div className="text-text-secondary font-bold text-lg line-through mb-1 opacity-70">
                     ₹{product.originalPrice.toLocaleString('en-IN')}
                   </div>
                 )}
 
                 <motion.div
                   key={product.price}
-                  initial={{ scale: 1.05, color: '#F2A900' }}
-                  animate={{ scale: 1, color: '#111827' }}
-                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                  className="text-4xl sm:text-5xl font-extrabold mb-2"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="text-5xl sm:text-6xl font-black mb-3 tracking-tighter text-text-primary"
                 >
-                  <span className="text-2xl align-top mr-1 text-text-primary">₹</span>
+                  <span className="text-2xl align-top mr-1 font-bold text-primary">₹</span>
                   {product.price.toLocaleString('en-IN')}
                 </motion.div>
 
-                <div className="text-sm font-medium text-seller flex items-center">
+                <div className="text-sm font-black text-seller flex items-center bg-seller/10 w-fit px-3 py-1 rounded-full">
                   <span className="relative flex h-2 w-2 mr-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success-400 opacity-75"></span>
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-seller opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-seller"></span>
                   </span>
-                  In Stock ({product.stock} available)
+                  LTD. STOCK: {product.stock} ITEMS
                 </div>
               </div>
 
@@ -261,12 +262,12 @@ export default function ProductDetailPage() {
                   </Button>
                 )}
 
-                <div className="flex gap-3 flex-col sm:flex-row">
-                  <Button onClick={handleBuyNow} className="flex-1 py-4 text-base bg-gray-900 hover:bg-black text-white hover:shadow-lg transition-all shadow-none">
-                    Buy Now
+                <div className="flex gap-4 flex-col sm:flex-row">
+                  <Button onClick={handleBuyNow} className="flex-1 py-5 text-lg font-black bg-text-primary hover:bg-text-primary/90 text-white hover:shadow-2xl hover:shadow-text-primary/20 transition-all rounded-2xl">
+                    Buy Directly
                   </Button>
-                  <Button onClick={handleAddToCart} variant="outline" className="flex-1 py-4 text-base bg-card hover:bg-background transition-all flex items-center justify-center">
-                    <ShoppingCart className="w-5 h-5 mr-2" /> Cart
+                  <Button onClick={handleAddToCart} variant="outline" className="flex-1 py-5 text-lg font-black bg-card hover:bg-background border-2 transition-all flex items-center justify-center rounded-2xl">
+                    <ShoppingCart className="w-6 h-6 mr-2" /> Add to Cart
                   </Button>
                 </div>
               </div>

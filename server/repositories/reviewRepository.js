@@ -40,6 +40,28 @@ class ReviewRepository {
     async findById(id) {
         return await Review.findById(id);
     }
+
+    async findAll(page = 1, limit = 20, status) {
+        const query = {};
+        if (status === 'approved') query.isApproved = true;
+        if (status === 'pending') query.isApproved = false;
+
+        const skip = (page - 1) * limit;
+        const reviews = await Review.find(query)
+            .populate('customerId', 'name email')
+            .populate('productId', 'name')
+            .sort({ createdAt: -1 })
+            .limit(limit * 1)
+            .skip(skip)
+            .lean();
+
+        const total = await Review.countDocuments(query);
+        return { reviews, total, totalPages: Math.ceil(total / limit) };
+    }
+
+    async updateStatus(id, isApproved) {
+        return await Review.findByIdAndUpdate(id, { isApproved }, { new: true });
+    }
 }
 
 module.exports = new ReviewRepository();

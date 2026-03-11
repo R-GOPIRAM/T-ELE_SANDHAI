@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Mail, Lock, User, ArrowRight } from 'lucide-react';
+import { Mail, Lock, User } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -63,9 +63,10 @@ export default function CustomerLoginPage() {
                 return;
             }
             toast.success(`Welcome back, ${loggedInUser.name}!`);
-            navigate('/customer/dashboard');
-        } catch {
-            toast.error('Login failed');
+            navigate('/dashboard');
+        } catch (err: any) {
+            const message = err.response?.data?.message || 'Invalid email or password';
+            toast.error(message);
         }
     };
 
@@ -85,40 +86,106 @@ export default function CustomerLoginPage() {
     };
 
     return (
-        <div className="min-h-screen bg-background flex items-center justify-center p-4">
-            <div className="max-w-[480px] w-full bg-card rounded-[3rem] shadow-xl p-10">
-                <div className="text-center mb-10">
-                    <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-6 text-white">
-                        <User className="w-8 h-8" />
+        <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 relative overflow-hidden">
+            {/* Animated Background Gradients */}
+            <div className="absolute top-1/4 -left-1/4 w-[600px] h-[600px] bg-primary/20 rounded-full blur-[120px] animate-pulse-slow -z-10" />
+            <div className="absolute -bottom-1/4 -right-1/4 w-[500px] h-[500px] bg-bargain/20 rounded-full blur-[100px] animate-pulse-slow -z-10" />
+
+            <div className="w-full max-w-md">
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                    className="glass-panel p-10 relative z-10"
+                >
+                    <div className="text-center mb-10">
+                        <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary-hover rounded-2xl flex items-center justify-center mx-auto mb-6 text-white shadow-lg shadow-primary/30 transform transition-transform duration-500 hover:scale-110">
+                            <User className="w-8 h-8" />
+                        </div>
+                        <h2 className="text-4xl font-heading font-black tracking-tight text-text-primary mb-2">
+                            {isLogin ? 'Customer Login' : 'Create Account'}
+                        </h2>
+                        <p className="text-text-secondary font-medium px-4">
+                            {isLogin ? 'Access your hyperlocal shopping terminal.' : 'Start your journey at T-ELE Sandhai.'}
+                        </p>
                     </div>
-                    <h2 className="text-3xl font-black">{isLogin ? 'Customer Login' : 'Join as Customer'}</h2>
-                    <p className="text-text-secondary mt-2">Shop locally from your neighborhood.</p>
-                </div>
 
-                <form onSubmit={isLogin ? handleLoginSubmit(onLoginSubmit) : handleRegSubmit(onRegisterSubmit)} className="space-y-6">
-                    <AnimatePresence>
-                        {!isLogin && (
-                            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}>
-                                <Input label="Full Name" icon={User} {...regRegister('name')} error={regErrors.name?.message} />
-                            </motion.div>
+                    <form onSubmit={isLogin ? handleLoginSubmit(onLoginSubmit) : handleRegSubmit(onRegisterSubmit)} className="space-y-5">
+                        <AnimatePresence>
+                            {!isLogin && (
+                                <motion.div
+                                    initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                                    animate={{ opacity: 1, height: 'auto', marginTop: 20 }}
+                                    exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                                    transition={{ duration: 0.3 }}
+                                >
+                                    <Input placeholder="Full Name" icon={User} {...regRegister('name')} error={regErrors.name?.message} className="bg-white/50 focus:bg-white transition-colors" />
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+
+                        <div className="space-y-5">
+                            <Input placeholder="Email Address" icon={Mail} {...(isLogin ? loginRegister('email') : regRegister('email'))} error={isLogin ? loginErrors.email?.message : regErrors.email?.message} className="bg-white/50 focus:bg-white transition-colors" />
+
+                            <Input placeholder="Password" icon={Lock} type="password" {...(isLogin ? loginRegister('password') : regRegister('password'))} error={isLogin ? loginErrors.password?.message : regErrors.password?.message} className="bg-white/50 focus:bg-white transition-colors" />
+
+                            <AnimatePresence>
+                                {!isLogin && (
+                                    <motion.div
+                                        initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                                        animate={{ opacity: 1, height: 'auto', marginTop: 20 }}
+                                        exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                                        transition={{ duration: 0.3 }}
+                                    >
+                                        <Input placeholder="Confirm Password" icon={Lock} type="password" {...regRegister('confirmPassword')} error={regErrors.confirmPassword?.message} className="bg-white/50 focus:bg-white transition-colors" />
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
+
+                        {isLogin && (
+                            <div className="flex justify-between items-center pt-1">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsLogin(false)}
+                                    className="text-xs font-black uppercase tracking-widest text-text-secondary hover:text-primary transition-all"
+                                >
+                                    Create Account
+                                </button>
+                                <button type="button" className="text-xs font-black uppercase tracking-widest text-primary hover:text-primary-hover transition-all">
+                                    Forgot Password?
+                                </button>
+                            </div>
                         )}
-                    </AnimatePresence>
 
-                    <Input label="Email" icon={Mail} {...(isLogin ? loginRegister('email') : regRegister('email'))} error={isLogin ? loginErrors.email?.message : regErrors.email?.message} />
+                        <Button
+                            type="submit"
+                            className="w-full py-4 text-xs font-black uppercase tracking-[0.2em] mt-8 shadow-xl shadow-primary/20 rounded-2xl border-none"
+                            isLoading={loading}
+                        >
+                            {isLogin ? 'Login' : 'Submit'}
+                        </Button>
+                    </form>
 
-                    <Input label="Password" icon={Lock} type="password" {...(isLogin ? loginRegister('password') : regRegister('password'))} error={isLogin ? loginErrors.password?.message : regErrors.password?.message} />
+                    {!isLogin && (
+                        <div className="mt-8 text-center border-t border-border/50 pt-6">
+                            <p className="text-xs text-text-secondary font-bold uppercase tracking-widest">
+                                Already have an account?
+                                <button
+                                    onClick={() => setIsLogin(true)}
+                                    className="ml-2 text-primary hover:text-primary-hover transition-colors"
+                                >
+                                    Login
+                                </button>
+                            </p>
+                        </div>
+                    )}
+                </motion.div>
 
-                    {!isLogin && <Input label="Confirm Password" icon={Lock} type="password" {...regRegister('confirmPassword')} error={regErrors.confirmPassword?.message} />}
-
-                    <Button type="submit" className="w-full py-6 rounded-2xl" isLoading={loading}>
-                        {isLogin ? 'Sign In' : 'Create Account'}
-                        <ArrowRight className="ml-2 w-5 h-5" />
-                    </Button>
-                </form>
-
-                <button onClick={() => setIsLogin(!isLogin)} className="w-full text-center mt-6 text-sm text-text-secondary hover:text-primary font-bold transition-colors">
-                    {isLogin ? "Don't have an account? Sign Up" : "Already a customer? Sign In"}
-                </button>
+                <div className="mt-8 text-center text-sm font-medium text-text-secondary/70">
+                    By continuing, you agree to T-ELE Sandhai's<br />
+                    <a href="#" className="hover:text-primary transition-colors">Terms of Service</a> & <a href="#" className="hover:text-primary transition-colors">Privacy Policy</a>
+                </div>
             </div>
         </div>
     );

@@ -8,10 +8,9 @@ exports.createReview = catchAsync(async (req, res) => {
 });
 
 exports.getProductReviews = catchAsync(async (req, res) => {
-    return sendResponse(res, 200, true, 'Product reviews fetched successfully', {
-        reviews,
-        pagination: metadata
-    });
+    const { productId } = req.params;
+    const result = await ReviewService.getProductReviews(productId, req.query);
+    return sendResponse(res, 200, true, 'Product reviews fetched successfully', result);
 });
 
 exports.getMyReviews = catchAsync(async (req, res) => {
@@ -22,4 +21,21 @@ exports.getMyReviews = catchAsync(async (req, res) => {
 exports.markHelpful = catchAsync(async (req, res) => {
     const review = await ReviewService.markHelpful(req.params.id);
     return sendResponse(res, 200, true, 'Review marked as helpful', review);
+});
+
+// Admin Moderation Methods
+exports.getAllReviews = catchAsync(async (req, res) => {
+    const result = await ReviewService.getAllReviews(req.query);
+    return sendResponse(res, 200, true, 'All reviews fetched successfully', result);
+});
+
+exports.updateReviewStatus = catchAsync(async (req, res) => {
+    const { status } = req.body;
+    const review = await ReviewService.updateReviewStatus(req.params.id, status === 'approved');
+    return sendResponse(res, 200, true, `Review ${status} successfully`, review);
+});
+
+exports.deleteReview = catchAsync(async (req, res) => {
+    await ReviewService.deleteReview(req.params.id);
+    return sendResponse(res, 200, true, 'Review deleted successfully', null);
 });

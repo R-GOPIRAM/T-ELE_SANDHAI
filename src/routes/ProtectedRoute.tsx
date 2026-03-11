@@ -33,7 +33,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
     if (allowedRoles && !allowedRoles.includes(user.role)) {
         // Redirect to a role-appropriate dashboard or home
         const fallback = user.role === 'customer' ? '/dashboard' :
-            user.role === 'seller' ? '/dashboard/seller' : '/dashboard/logistics';
+            user.role === 'seller' ? '/dashboard/seller' : '/admin';
         return <Navigate to={fallback} replace />;
     }
 

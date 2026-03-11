@@ -109,6 +109,17 @@ export const useAuthStore = create<AuthState>()(
                 store._isInitializing = true;
 
                 set({ isCheckingAuth: true });
+
+                // Cold-load guard: if no user is persisted in state, no session was ever
+                // established — skip the /api/auth/me network call entirely to prevent
+                // the 401 → refresh attempt → 401 cascade on unauthenticated page loads.
+                const currentUser = useAuthStore.getState().user;
+                if (!currentUser) {
+                    set({ user: null, isCheckingAuth: false });
+                    (useAuthStore as unknown as { _isInitializing?: boolean })._isInitializing = false;
+                    return;
+                }
+
                 try {
                     const { data } = await api.get('/auth/me');
                     const userObj = data.data.user;

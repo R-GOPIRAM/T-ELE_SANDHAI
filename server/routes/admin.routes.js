@@ -30,6 +30,9 @@ router.post(
 router.use(protect);
 router.use(authorizeRoles('admin'));
 
-// Future admin routes here...
+// User Management
+router.get('/users', adminController.getAllUsers);
+router.patch('/users/:id/suspend', adminController.suspendUser);
+router.delete('/users/:id', adminController.deleteUser);
 
 module.exports = router;

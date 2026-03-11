@@ -60,6 +60,16 @@ class SellerService {
 
         return await SellerRepository.updateVerificationStatus(id, status, reason);
     }
+
+    async getNearbyStores(lat, lng, radius = 50) {
+        const sellers = await SellerRepository.findNearby(lat, lng, radius);
+        const { calculateDistance } = require('../utils/distanceCalculator');
+
+        return sellers.map(seller => ({
+            ...seller,
+            distance: calculateDistance(lat, lng, seller.latitude, seller.longitude)
+        })).sort((a, b) => (a.distance || 0) - (b.distance || 0));
+    }
 }
 
 module.exports = new SellerService();

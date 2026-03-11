@@ -33,9 +33,9 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
                                 "bg-background/50 border-2 border-border rounded-2xl",
                                 "py-3.5 px-4",
                                 Icon && "pl-12",
-                                "focus:bg-card focus:outline-none focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500",
+                                "focus:bg-card focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary",
                                 "font-medium text-text-primary placeholder:text-text-secondary/50",
-                                error && "border-red-500 focus:ring-red-500/10 focus:border-red-500",
+                                error && "border-danger focus:ring-danger/10 focus:border-danger",
                                 className
                             )
                         )}

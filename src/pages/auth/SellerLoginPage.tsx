@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Mail, Lock, Store, ArrowRight } from 'lucide-react';
+import { Mail, Lock, Store } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -91,42 +91,98 @@ export default function SellerLoginPage() {
     };
 
     return (
-        <div className="min-h-screen bg-background flex items-center justify-center p-4">
-            <div className="max-w-[480px] w-full bg-card rounded-[3rem] shadow-xl p-10">
-                <div className="text-center mb-10">
-                    <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-6 text-white">
-                        <Store className="w-8 h-8" />
+        <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 relative overflow-hidden">
+            {/* Animated Background Gradients */}
+            <div className="absolute top-1/4 -right-1/4 w-[600px] h-[600px] bg-seller/20 rounded-full blur-[120px] animate-pulse-slow -z-10" />
+            <div className="absolute -bottom-1/4 -left-1/4 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[100px] animate-pulse-slow -z-10" />
+
+            <div className="w-full max-w-md">
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                    className="glass-panel p-10 relative z-10"
+                >
+                    <div className="text-center mb-10">
+                        <div className="w-20 h-20 bg-gradient-to-br from-seller to-seller-hover rounded-2xl flex items-center justify-center mx-auto mb-6 text-white shadow-lg shadow-seller/30 transform -rotate-3 hover:-rotate-6 transition-transform duration-300">
+                            <Store className="w-10 h-10" />
+                        </div>
+                        <h2 className="text-3xl font-heading font-black tracking-tight text-text-primary mb-2">
+                            {isLogin ? 'Seller Portal' : 'Join as Seller'}
+                        </h2>
+                        <p className="text-text-secondary font-medium">
+                            {isLogin ? 'Manage your inventory and sales.' : 'Start selling to your local community.'}
+                        </p>
                     </div>
-                    <h2 className="text-3xl font-black">{isLogin ? 'Seller Portal' : 'Join as Seller'}</h2>
-                    <p className="text-text-secondary mt-2">Manage your inventory and sales.</p>
-                </div>
 
-                <form onSubmit={isLogin ? handleLoginSubmit(onLoginSubmit) : handleRegSubmit(onRegisterSubmit)} className="space-y-6">
-                    <AnimatePresence>
-                        {!isLogin && (
-                            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="space-y-4">
-                                <Input label="Business Name" icon={Store} {...regRegister('businessName')} error={regErrors.businessName?.message} />
-                                <Input label="Owner Name" icon={Store} {...regRegister('name')} error={regErrors.name?.message} />
-                                <Input label="Business Address" icon={Store} {...regRegister('businessAddress')} error={regErrors.businessAddress?.message} />
-                                <Input label="Phone Number" icon={Store} {...regRegister('phone')} error={regErrors.phone?.message} />
-                                <Input label="PAN Number" icon={Store} {...regRegister('panNumber')} error={regErrors.panNumber?.message} />
-                            </motion.div>
+                    <form onSubmit={isLogin ? handleLoginSubmit(onLoginSubmit) : handleRegSubmit(onRegisterSubmit)} className="space-y-5">
+                        <AnimatePresence>
+                            {!isLogin && (
+                                <motion.div
+                                    initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                                    animate={{ opacity: 1, height: 'auto', marginTop: 20 }}
+                                    exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                                    transition={{ duration: 0.3 }}
+                                    className="space-y-4"
+                                >
+                                    <Input placeholder="Business Name" icon={Store} {...regRegister('businessName')} error={regErrors.businessName?.message} className="bg-white/50 focus:bg-white transition-colors" />
+                                    <Input placeholder="Owner Name" icon={Store} {...regRegister('name')} error={regErrors.name?.message} className="bg-white/50 focus:bg-white transition-colors" />
+                                    <Input placeholder="Business Address" icon={Store} {...regRegister('businessAddress')} error={regErrors.businessAddress?.message} className="bg-white/50 focus:bg-white transition-colors" />
+                                    <Input placeholder="Phone Number" icon={Store} {...regRegister('phone')} error={regErrors.phone?.message} className="bg-white/50 focus:bg-white transition-colors" />
+                                    <Input placeholder="PAN Number" icon={Store} {...regRegister('panNumber')} error={regErrors.panNumber?.message} className="bg-white/50 focus:bg-white transition-colors" />
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+
+                        <div className="space-y-5">
+                            <Input placeholder="Email Address" icon={Mail} {...(isLogin ? loginRegister('email') : regRegister('email'))} error={isLogin ? loginErrors.email?.message : regErrors.email?.message} className="bg-white/50 focus:bg-white transition-colors" />
+
+                            <Input placeholder="Password" icon={Lock} type="password" {...(isLogin ? loginRegister('password') : regRegister('password'))} error={isLogin ? loginErrors.password?.message : regErrors.password?.message} className="bg-white/50 focus:bg-white transition-colors" />
+
+                            <AnimatePresence>
+                                {!isLogin && (
+                                    <motion.div
+                                        initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                                        animate={{ opacity: 1, height: 'auto', marginTop: 20 }}
+                                        exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                                        transition={{ duration: 0.3 }}
+                                    >
+                                        <Input placeholder="Confirm Password" icon={Lock} type="password" {...regRegister('confirmPassword')} error={regErrors.confirmPassword?.message} className="bg-white/50 focus:bg-white transition-colors" />
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
+
+                        {isLogin && (
+                            <div className="flex justify-end pt-1">
+                                <button type="button" className="text-sm font-bold text-seller hover:text-seller-hover transition-colors">
+                                    Forgot password?
+                                </button>
+                            </div>
                         )}
-                    </AnimatePresence>
 
-                    <Input label="Email" icon={Mail} {...(isLogin ? loginRegister('email') : regRegister('email'))} error={isLogin ? loginErrors.email?.message : regErrors.email?.message} />
-                    <Input label="Password" icon={Lock} type="password" {...(isLogin ? loginRegister('password') : regRegister('password'))} error={isLogin ? loginErrors.password?.message : regErrors.password?.message} />
-                    {!isLogin && <Input label="Confirm Password" icon={Lock} type="password" {...regRegister('confirmPassword')} error={regErrors.confirmPassword?.message} />}
+                        <Button type="submit" className="w-full py-4 text-lg mt-6 shadow-xl shadow-seller/20 bg-seller hover:bg-seller-hover" isLoading={loading}>
+                            {isLogin ? 'Sign In' : 'Begin Verification'}
+                        </Button>
+                    </form>
 
-                    <Button type="submit" className="w-full py-6 rounded-2xl" isLoading={loading}>
-                        {isLogin ? 'Sign In' : 'Begin Verification'}
-                        <ArrowRight className="ml-2 w-5 h-5" />
-                    </Button>
-                </form>
+                    <div className="mt-8 text-center border-t border-border/50 pt-6">
+                        <p className="text-text-secondary font-medium">
+                            {isLogin ? "Want to sell with us?" : "Already a seller?"}
+                            <button
+                                onClick={() => setIsLogin(!isLogin)}
+                                className="ml-2 text-seller font-black hover:text-seller-hover transition-colors"
+                            >
+                                {isLogin ? "Sign Up" : "Sign In"}
+                            </button>
+                        </p>
+                    </div>
+                </motion.div>
 
-                <button onClick={() => setIsLogin(!isLogin)} className="w-full text-center mt-6 text-sm text-text-secondary hover:text-primary font-bold transition-colors">
-                    {isLogin ? "Want to sell with us? Sign Up" : "Already a seller? Sign In"}
-                </button>
+                <div className="mt-8 text-center text-sm font-medium text-text-secondary/70">
+                    By continuing, you agree to T-ELE Sandhai's<br />
+                    <a href="#" className="hover:text-seller transition-colors">Seller Agreement</a> & <a href="#" className="hover:text-seller transition-colors">Privacy Policy</a>
+                </div>
             </div>
         </div>
     );

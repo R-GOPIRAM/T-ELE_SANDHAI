@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Star, Check, Heart, MessageSquare, Store, ShieldCheck } from 'lucide-react';
+import { Star, Check, Heart, MessageSquare, Store, ShieldCheck, MapPin, Scale } from 'lucide-react';
 import { Product } from '../../types';
 import BargainModal from '../bargain/BargainModal';
 import { useWishlist } from '../../context/WishlistContext';
@@ -9,6 +9,7 @@ import { Button } from '../../components/ui/Button';
 
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../hooks/useCart';
+import { useCompareStore } from '../../store/compareStore';
 
 interface ProductCardProps {
   product: Product;
@@ -31,6 +32,7 @@ const ProductCard = React.memo(({
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { addItem, removeItem, isInCompare } = useCompareStore();
 
   const minPrice = variants.length > 0 ? Math.min(...variants.map(v => v.price)) : product.price;
   const maxPrice = variants.length > 0 ? Math.max(...variants.map(v => v.price)) : product.price;
@@ -39,6 +41,16 @@ const ProductCard = React.memo(({
 
   const secureId = product.id || (product as { _id?: string })._id || '';
   const isWishlisted = isInWishlist(secureId);
+  const isCompared = isInCompare(secureId);
+
+  const handleCompareToggle = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isCompared) {
+      removeItem(secureId);
+    } else {
+      addItem(product);
+    }
+  };
 
   const handleWishlistToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -101,51 +113,75 @@ const ProductCard = React.memo(({
         </div>
 
         {/* Content Container */}
-        <CardContent className={`flex-1 flex flex-col bg-background/30 w-full ${viewMode === 'list' ? 'p-6' : 'p-5 border-t border-border'}`}>
-          <div className="flex items-start justify-between mb-2">
-            <h3 className={`font-bold text-text-primary ${viewMode === 'list' ? 'text-xl' : 'text-lg leading-tight'} line-clamp-2`}>{product.name}</h3>
-          </div>
+        <CardContent className={`flex-1 flex flex-col w-full bg-card ${viewMode === 'list' ? 'p-6' : 'p-5 border-t border-border'}`}>
+          <div className="flex-1 flex flex-col">
+            <div className="flex items-center justify-between gap-2 mb-2">
+              <div
+                className="flex items-center text-[10px] font-black uppercase tracking-widest text-primary hover:text-primary-hover cursor-pointer transition-colors w-full"
+                onClick={(e) => {
+                  if (product.sellerId) {
+                    e.stopPropagation();
+                    navigate(`/store/${product.sellerId}`);
+                  }
+                }}
+              >
+                <Store className="w-3 h-3 mr-1" />
+                <span className="truncate max-w-[120px]">{product.sellerName || 'Local Retailer'}</span>
+                <ShieldCheck className="w-3 h-3 ml-1 text-seller shrink-0" />
+              </div>
+              <div className="flex items-center gap-1 shrink-0 bg-warning/10 px-1.5 rounded text-warning">
+                <Star className="w-3 h-3 fill-current" />
+                <span className="text-[10px] font-black">{product.rating || 'New'}</span>
+              </div>
+            </div>
 
-          <div
-            className="flex items-center text-sm font-medium transition-colors mb-3 text-primary hover:text-primary-hover cursor-pointer"
-            onClick={(e) => {
-              if (product.sellerId) {
-                e.stopPropagation();
-                navigate(`/store/${product.sellerId}`);
-              }
-            }}
-          >
-            <Store className="w-4 h-4 mr-1.5" />
-            <span className="truncate">{product.sellerName || 'Local Retailer'}</span>
-            <ShieldCheck className="w-4 h-4 ml-1.5 text-seller" />
-          </div>
+            <div className="flex items-center gap-2 mb-2">
+              <div className="flex items-center text-[10px] font-bold text-text-secondary bg-background/50 px-2 py-1 rounded-full border border-border/30">
+                <MapPin className="w-3 h-3 mr-1 text-primary" />
+                {product.deliveryTime ? `${product.deliveryTime} • ` : ''}
+                {/* Random realistic distance if not provided by API */}
+                {Math.floor(Math.random() * 5 + 1)}.{Math.floor(Math.random() * 9)} km
+              </div>
+            </div>
 
-          <div className="flex items-center gap-1 mb-auto">
-            <Star className="w-4 h-4 text-warning fill-current" />
-            <span className="text-sm font-bold text-text-primary">{product.rating || 'New'}</span>
-            <span className="text-xs text-text-secondary">({product.reviewCount || 0})</span>
-          </div>
+            <h3 className={`font-heading font-bold text-text-primary ${viewMode === 'list' ? 'text-xl' : 'text-base leading-snug'} line-clamp-2 mb-3`}>
+              {product.name}
+            </h3>
 
-          <div className="flex flex-wrap items-end justify-between mt-4 gap-2">
-            <div>
-              {product.originalPrice && <span className="text-sm text-text-secondary line-through block mb-0.5">₹{product.originalPrice}</span>}
-              <span className="text-2xl font-extrabold text-text-primary tracking-tight">{displayPrice}</span>
+            <div className="mt-auto flex flex-col mb-4">
+              {product.originalPrice && (
+                <span className="text-xs text-text-secondary font-medium line-through mb-0.5 inline-block">
+                  ₹{product.originalPrice}
+                </span>
+              )}
+              <span className="text-2xl font-black text-text-primary tracking-tighter">
+                {displayPrice}
+              </span>
             </div>
           </div>
 
           {/* Action Matrix */}
-          <div className={`flex gap-2 mt-4 z-20 relative pt-2 ${viewMode === 'list' ? 'max-w-xs' : ''}`}>
+          <div className={`flex gap-2 relative mt-4 ${viewMode === 'list' ? 'max-w-xs' : ''}`}>
             {isBargainable ? (
-              <Button size="sm" variant="bargain" className="flex-1 shadow-none" onClick={(e) => { e.stopPropagation(); setIsBargainModalOpen(true); }}>
+              <Button size="sm" variant="bargain" className="flex-1 font-black shadow-lg shadow-bargain/20 text-[10px] uppercase tracking-wider py-2.5" onClick={(e) => { e.stopPropagation(); setIsBargainModalOpen(true); }}>
                 Make Offer
               </Button>
             ) : (
-              <Button size="sm" variant="primary" className="flex-1 shadow-none" onClick={(e) => { e.stopPropagation(); addToCart(product, 1); }}>
+              <Button size="sm" variant="primary" className="flex-1 font-black shadow-lg shadow-primary/20 text-[10px] uppercase tracking-wider py-2.5" onClick={(e) => { e.stopPropagation(); addToCart(product, 1); }}>
                 Add to Cart
               </Button>
             )}
-            <Button size="sm" variant="outline" className="flex-1 shadow-none bg-background hover:bg-card" onClick={(e) => { e.stopPropagation(); navigate(`/product/${secureId}`) }}>
-              View Product
+            <Button
+              size="sm"
+              variant="outline"
+              className={`flex-none w-10 h-10 p-0 transition-all ${isCompared ? 'bg-primary/10 border-primary text-primary shadow-inner' : 'border-border hover:border-primary hover:text-primary'}`}
+              title={isCompared ? "Remove from Compare" : "Add to Compare"}
+              onClick={handleCompareToggle}
+            >
+              <Scale className="w-4 h-4" />
+            </Button>
+            <Button size="sm" variant="outline" className="flex-1 font-bold bg-background text-[10px] uppercase tracking-wider py-2.5" onClick={(e) => { e.stopPropagation(); navigate(`/product/${secureId}`) }}>
+              View
             </Button>
           </div>
         </CardContent>

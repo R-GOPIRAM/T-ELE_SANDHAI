@@ -22,7 +22,7 @@ const DashboardLayout: React.FC = () => {
             <aside className="hidden md:flex w-64 flex-col bg-card border-r border-border sticky top-0 h-screen">
                 <div className="p-6">
                     <Link to="/" className="flex items-center gap-2">
-                        <span className="text-2xl font-black tracking-tighter text-primary">LOCALMART</span>
+                        <span className="text-2xl font-black tracking-tighter text-primary">T-ELE Sandhai</span>
                     </Link>
                 </div>
 

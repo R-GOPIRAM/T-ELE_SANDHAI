@@ -33,6 +33,19 @@ class SellerRepository {
 
         return await Seller.findByIdAndUpdate(id, update, { new: true });
     }
+
+    async findNearby(lat, lng, radiusKm = 50) {
+        // Approximate degrees for the given radius
+        // 1 degree latitude is approx 111km
+        const latDelta = radiusKm / 111;
+        const lngDelta = radiusKm / (111 * Math.cos(lat * Math.PI / 180));
+
+        return await Seller.find({
+            latitude: { $gte: lat - latDelta, $lte: lat + latDelta },
+            longitude: { $gte: lng - lngDelta, $lte: lng + lngDelta },
+            sellerStatus: 'approved'
+        }).populate('userId', 'name email').lean();
+    }
 }
 
 module.exports = new SellerRepository();
