@@ -1,22 +1,27 @@
-const mongoose = require('mongoose');
-const logger = require('../utils/logger');
+const MongoClient = require('mongodb').MongoClient;
 
-const connectDB = async () => {
-  try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/tele-sandhai', {
-      // These options are no longer needed in Mongoose 6+, but keeping for safety if older version
-    });
-    logger.info(`MongoDB Connected: ${conn.connection.host}`);
-
-    // Enable mongoose debug logging to physically print executing index queries
-    if (process.env.NODE_ENV === 'development') {
-      mongoose.set('debug', true);
-      logger.info('Mongoose query debugging enabled for performance verification.');
-    }
-  } catch (error) {
-    logger.error('Database connection error:', error);
-    process.exit(1);
-  }
+const uri = "your_mongo_uri_here";
+const options = {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    serverSelectionTimeoutMS: 5000, // Timeout of 5 seconds
+    maxPoolSize: 10
 };
 
-module.exports = connectDB;
+async function connectWithRetry() {
+    let retries = 5;
+    while (retries) {
+        try {
+            const client = await MongoClient.connect(uri, options);
+            console.log('Database connected successfully');
+            return client;
+        } catch (err) {
+            console.error('Database connection failed. Retrying in 5 seconds...', err);
+            await new Promise(res => setTimeout(res, Math.pow(2, 5 - retries) * 1000)); // Exponential backoff
+            retries -= 1;
+        }
+    }
+    throw new Error('Failed to connect to database after multiple retries.');
+}
+
+module.exports = connectWithRetry;
