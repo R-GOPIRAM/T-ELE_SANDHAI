@@ -2,41 +2,39 @@ const AuthService = require('../services/authService');
 const catchAsync = require('../utils/catchAsync');
 const { sendResponse } = require('../utils/response');
 
-// 🔥 Centralized cookie config (production-safe)
+// 🔥 Cookie config (FINAL CORRECT VERSION)
 const COOKIE_OPTIONS = {
     httpOnly: true,
-    secure: true,        // ✅ Always true (Render = HTTPS)
-    sameSite: "None",    // ✅ Required for cross-origin (Vercel → Render)
-    path: "/",
+    secure: true,          // required for HTTPS (Render)
+    sameSite: "None",      // required for Vercel → Render
+    path: "/",             // important
+    // ❌ DO NOT set domain
 };
 
 // ==========================
-// SEND TOKEN RESPONSE
+// 🔐 SEND TOKEN RESPONSE
 // ==========================
 const sendTokenResponse = (user, accessToken, refreshToken, res) => {
 
-    const accessTokenOptions = {
+    res.cookie("accessToken", accessToken, {
         ...COOKIE_OPTIONS,
         expires: new Date(Date.now() + 15 * 60 * 1000), // 15 min
-    };
+    });
 
-    const refreshTokenOptions = {
+    res.cookie("refreshToken", refreshToken, {
         ...COOKIE_OPTIONS,
         expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
-    };
+    });
 
-    // 🔥 Set cookies
-    res.cookie("accessToken", accessToken, accessTokenOptions);
-    res.cookie("refreshToken", refreshToken, refreshTokenOptions);
-
-    return sendResponse(res, 200, true, "Authentication successful", {
+    return res.status(200).json({
+        success: true,
+        message: "Authentication successful",
         user: {
             id: user._id,
             name: user.name,
             email: user.email,
             role: user.role
-        },
-        accessToken
+        }
     });
 };
 
@@ -94,7 +92,7 @@ exports.logout = catchAsync(async (req, res) => {
 
     await AuthService.logout(req.user.id);
 
-    // 🔥 Clear cookies correctly
+    // 🔥 Must match cookie options exactly
     res.clearCookie("accessToken", COOKIE_OPTIONS);
     res.clearCookie("refreshToken", COOKIE_OPTIONS);
 
@@ -107,6 +105,13 @@ exports.logout = catchAsync(async (req, res) => {
 exports.refresh = catchAsync(async (req, res) => {
 
     const refreshToken = req.cookies.refreshToken;
+
+    if (!refreshToken) {
+        return res.status(401).json({
+            success: false,
+            message: "Refresh token is required"
+        });
+    }
 
     const { user, accessToken, newRefreshToken } =
         await AuthService.refreshAccessToken(refreshToken);
