@@ -26,6 +26,9 @@ validateEnv();
 // Initialize app
 const app = express();
 
+// Trust first proxy (Render/load balancers) so `req.ip` and `req.secure` are correct.
+app.set("trust proxy", 1);
+
 // Connect DB
 if (process.env.NODE_ENV !== "test") {
   connectDB();
