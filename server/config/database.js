@@ -1,27 +1,16 @@
-const MongoClient = require('mongodb').MongoClient;
+const mongoose = require('mongoose');
 
-const uri = "your_mongo_uri_here";
-const options = {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    serverSelectionTimeoutMS: 5000, // Timeout of 5 seconds
-    maxPoolSize: 10
+const connectDB = async () => {
+  try {
+    const conn = await mongoose.connect(process.env.MONGO_URI, {
+      serverSelectionTimeoutMS: 5000,
+    });
+
+    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
+  } catch (err) {
+    console.error(`❌ DB Connection Error: ${err.message}`);
+    process.exit(1);
+  }
 };
 
-async function connectWithRetry() {
-    let retries = 5;
-    while (retries) {
-        try {
-            const client = await MongoClient.connect(uri, options);
-            console.log('Database connected successfully');
-            return client;
-        } catch (err) {
-            console.error('Database connection failed. Retrying in 5 seconds...', err);
-            await new Promise(res => setTimeout(res, Math.pow(2, 5 - retries) * 1000)); // Exponential backoff
-            retries -= 1;
-        }
-    }
-    throw new Error('Failed to connect to database after multiple retries.');
-}
-
-module.exports = connectWithRetry;
+module.exports = connectDB;
