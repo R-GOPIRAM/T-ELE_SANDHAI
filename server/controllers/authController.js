@@ -70,11 +70,11 @@ exports.logout = catchAsync(async (req, res) => {
     await AuthService.logout(req.user.id);
 
     const cookieOptions = {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none",
-        expires: new Date(Date.now() + 10 * 1000)
-    };
+    httpOnly: true,
+    secure: true,
+    sameSite: "None",
+    path: "/",
+};
 
     res.clearCookie("accessToken", cookieOptions);
     res.clearCookie("refreshToken", cookieOptions);

@@ -55,7 +55,7 @@ app.use(
           "blob:",
           "https://res.cloudinary.com",
         ],
-        connectSrc: ["'self'", "https://api.razorpay.com"],
+        connectSrc: ["'self'", "https://api.razorpay.com","https://inspirathon.onrender.com"],
         frameSrc: ["'self'", "https://checkout.razorpay.com"],
       },
     },

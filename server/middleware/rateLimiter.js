@@ -15,7 +15,7 @@ exports.apiLimiter = rateLimit({
 // Strict Limiter for Authentication Routes (Login/Register)
 exports.authLimiter = rateLimit({
     windowMs: 60 * 60 * 1000, // 1 hour
-    max: 15, // Limit each IP to 15 login/register requests per `window` (here, per hour)
+    max: 100, // Limit each IP to 15 login/register requests per `window` (here, per hour)
     standardHeaders: true,
     legacyHeaders: false,
     message: {
