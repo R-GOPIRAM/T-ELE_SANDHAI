@@ -1,0 +1,21 @@
+const express = require('express');
+const authController = require('../controllers/authController');
+const { protect } = require('../middleware/authMiddleware');
+const validate = require('../middleware/validateResource');
+const { registerCustomerSchema, registerSellerSchema, signupSchema, loginSchema, updateProfileSchema } = require('../validators/auth.schema');
+const loginLimiter = require('../middleware/loginLimiter');
+
+const router = express.Router();
+
+// Backwards-compatible unified signup endpoint (role: customer|seller)
+router.post('/signup', validate(signupSchema), authController.signup);
+router.post('/register/customer', validate(registerCustomerSchema), authController.registerCustomer);
+router.post('/register/seller', validate(registerSellerSchema), authController.registerSeller);
+router.post('/login', loginLimiter, validate(loginSchema), authController.login);
+router.post('/refresh', authController.refresh);
+router.post('/logout', protect, authController.logout);
+router.get('/me', protect, authController.getMe);
+router.get('/profile', protect, authController.getMe); // Alias for compatibility
+router.put('/profile', protect, validate(updateProfileSchema), authController.updateProfile);
+
+module.exports = router;
