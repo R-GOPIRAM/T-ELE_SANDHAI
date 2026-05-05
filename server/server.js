@@ -31,7 +31,9 @@ if (process.env.NODE_ENV !== "test") {
   connectDB();
 }
 
-// Security headers
+// ==========================
+// 🔐 SECURITY HEADERS (HELMET)
+// ==========================
 app.use(
   helmet({
     contentSecurityPolicy: {
@@ -55,7 +57,11 @@ app.use(
           "blob:",
           "https://res.cloudinary.com",
         ],
-        connectSrc: ["'self'", "https://api.razorpay.com","https://inspirathon.onrender.com"],
+        connectSrc: [
+          "'self'",
+          "https://api.razorpay.com",
+          "https://inspirathon.onrender.com", // 🔥 IMPORTANT
+        ],
         frameSrc: ["'self'", "https://checkout.razorpay.com"],
       },
     },
@@ -63,31 +69,51 @@ app.use(
   })
 );
 
-// CORS
+// ==========================
+// 🌐 CORS (FIRST)
+// ==========================
 const corsOptions = require("./config/cors");
+
 app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); // 🔥 allow preflight
 
-// Rate limiting
-const { apiLimiter, authLimiter } = require("./middleware/rateLimiter");
-app.use("/api", apiLimiter);
-app.use("/api/auth", authLimiter);
-
-// Body parsers
+// ==========================
+// 📦 BODY PARSERS (SECOND)
+// ==========================
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 app.use(cookieParser());
 
-// Data sanitization
+// ==========================
+// 🚫 RATE LIMIT (SKIP OPTIONS)
+// ==========================
+const { apiLimiter, authLimiter } = require("./middleware/rateLimiter");
+
+app.use("/api", (req, res, next) => {
+  if (req.method === "OPTIONS") return next();
+  return apiLimiter(req, res, next);
+});
+
+app.use("/api/auth", (req, res, next) => {
+  if (req.method === "OPTIONS") return next();
+  return authLimiter(req, res, next);
+});
+
+// ==========================
+// 🛡️ SANITIZATION + SECURITY
+// ==========================
 app.use(mongoSanitizeMiddleware);
 app.use(xssMiddleware);
 app.use(hpp());
 
-// Logger
+// ==========================
+// 🧾 LOGGER
+// ==========================
 app.use(loggerMiddleware);
 
-/* ================================
-ROOT ROUTE (for Render health)
-================================ */
+// ==========================
+// 🏠 ROOT ROUTE (Render Health)
+// ==========================
 app.get("/", (req, res) => {
   res.status(200).json({
     success: true,
@@ -95,7 +121,9 @@ app.get("/", (req, res) => {
   });
 });
 
-// Static files
+// ==========================
+// 📁 STATIC FILES
+// ==========================
 const clientBuildPath = path.join(__dirname, "..", "dist");
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
@@ -104,12 +132,17 @@ if (process.env.NODE_ENV === "production") {
   app.use(express.static(clientBuildPath));
 }
 
-// Routes (both versioned and unversioned for backwards compatibility)
+// ==========================
+// 🔗 ROUTES
+// ==========================
 const apiRouter = require("./routes");
+
 app.use("/api", apiRouter);
 app.use("/api/v1", apiRouter);
 
-// Health check
+// ==========================
+// ❤️ HEALTH CHECK
+// ==========================
 app.get("/api/health", (req, res) => {
   res.status(200).json({
     status: "success",
@@ -118,7 +151,9 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// 404 handler
+// ==========================
+// ❌ 404 HANDLER
+// ==========================
 app.all(/(.*)/, (req, res, next) => {
   if (req.originalUrl.startsWith("/api")) {
     return next(
@@ -133,8 +168,12 @@ app.all(/(.*)/, (req, res, next) => {
   next(new AppError("Route not found", 404));
 });
 
-// Global error handler
+// ==========================
+// 🔥 GLOBAL ERROR HANDLER
+// ==========================
 app.use(globalErrorHandler);
 
-// Export app
+// ==========================
+// EXPORT
+// ==========================
 module.exports = app;
