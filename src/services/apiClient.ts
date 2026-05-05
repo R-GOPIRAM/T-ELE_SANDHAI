@@ -2,14 +2,14 @@ import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import { useLocationStore } from '../store/locationStore';
 
-// 🔥 Always use deployed backend in production
+// ✅ Base URL (production-safe)
 const BASE_URL =
   import.meta.env.VITE_API_URL ||
   (import.meta.env.PROD
-    ? 'https://inspirathon.onrender.com/api' // ✅ FIXED (no /api relative)
+    ? 'https://inspirathon.onrender.com/api'
     : 'http://localhost:5000/api');
 
-// ✅ Create axios instance
+// ✅ Axios instance
 const api = axios.create({
   baseURL: BASE_URL,
   headers: {
@@ -19,11 +19,10 @@ const api = axios.create({
 });
 
 // ==========================
-// REQUEST INTERCEPTOR
+// ✅ REQUEST INTERCEPTOR
 // ==========================
 api.interceptors.request.use(
   (config) => {
-    // Inject location headers
     const location = useLocationStore.getState().location;
 
     if (location) {
@@ -32,25 +31,27 @@ api.interceptors.request.use(
       config.headers['x-user-pincode'] = location.pincode;
     }
 
-    // 🔥 Ensure cookies always sent
     config.withCredentials = true;
-
     return config;
   },
   (error) => Promise.reject(error)
 );
 
 // ==========================
-// RESPONSE INTERCEPTOR
+// ✅ RESPONSE INTERCEPTOR
 // ==========================
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // 🔥 IMPORTANT: DO NOT reject successful responses
+    return response;
+  },
+
   async (error) => {
     const originalRequest = error.config;
 
     // 🔴 Network error
     if (!error.response) {
-      if (!originalRequest.url?.includes('/auth/me')) {
+      if (!originalRequest?.url?.includes('/auth/me')) {
         toast.error('Network error. Check your connection.');
       }
       return Promise.reject(error);
@@ -59,38 +60,27 @@ api.interceptors.response.use(
     const status = error.response.status;
 
     const isAuthEndpoint =
-      originalRequest.url?.includes('/auth/login') ||
-      originalRequest.url?.includes('/auth/register') ||
-      originalRequest.url?.includes('/auth/refresh');
+      originalRequest?.url?.includes('/auth/login') ||
+      originalRequest?.url?.includes('/auth/register') ||
+      originalRequest?.url?.includes('/auth/signup') ||
+      originalRequest?.url?.includes('/auth/refresh');
 
     // ==========================
-    // 🔥 HANDLE TOKEN EXPIRED
+    // 🔥 TOKEN EXPIRED (401)
     // ==========================
     if (status === 401 && !originalRequest._retry && !isAuthEndpoint) {
       originalRequest._retry = true;
 
       try {
-        // 🔥 FIX: use SAME api instance (not axios)
         await api.post('/auth/refresh');
 
-        // retry original request
         return api(originalRequest);
       } catch (refreshError) {
-        // 🔴 Refresh failed → logout
         localStorage.removeItem('auth-storage');
 
-        const loginPaths = [
-          '/login/customer',
-          '/login/seller',
-          '/login/admin',
-          '/login',
-        ];
+        const isLoginPage = window.location.pathname.includes('/login');
 
-        const isLoginPage = loginPaths.some((path) =>
-          window.location.pathname.startsWith(path)
-        );
-
-        if (!isLoginPage && !originalRequest.url?.includes('/auth/me')) {
+        if (!isLoginPage) {
           toast.error('Session expired. Please login again.');
           window.location.href = '/login/customer';
         }
@@ -100,8 +90,18 @@ api.interceptors.response.use(
     }
 
     // ==========================
-    // OTHER ERRORS
+    // 🔥 HANDLE VALIDATION ERRORS CLEANLY
     // ==========================
+    if (status === 400) {
+      // ❗ DO NOT show generic "registration failed"
+      const msg =
+        error.response.data?.message ||
+        error.response.data?.error ||
+        'Invalid request';
+
+      toast.error(msg);
+      return Promise.reject(error);
+    }
 
     if (status === 403) {
       toast.error(
@@ -110,14 +110,8 @@ api.interceptors.response.use(
       );
     }
 
-    if (status === 400) {
-      toast.error(
-        error.response.data?.message || 'Invalid request parameters'
-      );
-    }
-
     if (status >= 500) {
-      if (!originalRequest.url?.includes('/auth/me')) {
+      if (!originalRequest?.url?.includes('/auth/me')) {
         toast.error(
           error.response.data?.message ||
             'Server error. Please try again later.'
