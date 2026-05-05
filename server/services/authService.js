@@ -30,6 +30,7 @@ class AuthService {
 
     async _registerUser(userData) {
         const existingUser = await UserRepository.findByEmail(userData.email);
+        console.log("DEBUG existingUser:", existingUser);
         if (existingUser) {
             throw new AppError('Email already in use', 400);
         }
