@@ -26,131 +26,179 @@ export const useAuthStore = create<AuthState>()(
             isCheckingAuth: true,
             error: null,
 
+            // ==========================
+            // LOGIN
+            // ==========================
             login: async (credentials) => {
                 set({ isLoading: true, error: null });
+
                 try {
                     const { data } = await api.post('/auth/login', credentials);
-                    const userObj = data.data.user;
+
+                    // ✅ FIX: correct response parsing
+                    const userObj = data?.user;
+
+                    if (!userObj) {
+                        throw new Error("Invalid login response");
+                    }
 
                     set({
                         user: userObj,
                         isLoading: false
                     });
 
-                    // Background cart sync - isolated and non-blocking
+                    // Background cart sync
                     setTimeout(() => {
                         useCartStore.getState().mergeLocalCart().catch(err =>
-                            console.error('Secondary: Cart sync failed after login', err)
+                            console.error('Cart sync failed after login', err)
                         );
                     }, 0);
 
                     return userObj;
+
                 } catch (err) {
                     const error = err as { response?: { data?: { message?: string } } };
                     const message = error.response?.data?.message || 'Login failed';
+
                     set({ error: message, isLoading: false });
                     throw err;
-                } finally {
-                    set({ isLoading: false });
                 }
             },
 
+            // ==========================
+            // REGISTER
+            // ==========================
             register: async (registerData) => {
                 set({ isLoading: true, error: null });
+
                 try {
-                    const endpoint = registerData.role === 'seller' ? '/auth/register/seller' : '/auth/register/customer';
+                    const endpoint =
+                        registerData.role === 'seller'
+                            ? '/auth/register/seller'
+                            : '/auth/register/customer';
+
                     const { data } = await api.post(endpoint, registerData);
-                    const userObj = data.data.user;
+
+                    // ✅ FIX: correct response parsing
+                    const userObj = data?.user;
+
+                    if (!userObj) {
+                        throw new Error("Invalid register response");
+                    }
 
                     set({
                         user: userObj,
                         isLoading: false
                     });
 
-                    // Background cart sync - isolated and non-blocking
+                    // Background cart sync
                     setTimeout(() => {
                         useCartStore.getState().mergeLocalCart().catch(err =>
-                            console.error('Secondary: Cart sync failed after registration', err)
+                            console.error('Cart sync failed after registration', err)
                         );
                     }, 0);
 
                     return userObj;
+
                 } catch (err) {
                     const error = err as { response?: { data?: { message?: string } } };
                     const message = error.response?.data?.message || 'Registration failed';
+
                     set({ error: message, isLoading: false });
                     throw err;
-                } finally {
-                    set({ isLoading: false });
                 }
             },
 
+            // ==========================
+            // LOGOUT
+            // ==========================
             logout: async () => {
                 try {
                     await api.post('/auth/logout');
                 } catch (error) {
-                    console.error('Secondary: Logout API failed', error);
+                    console.error('Logout API failed', error);
                 } finally {
                     localStorage.removeItem('auth-storage');
-                    set({ user: null, error: null });
-                    // Clear cart on logout
+
+                    set({
+                        user: null,
+                        error: null
+                    });
+
                     try {
                         useCartStore.getState().clearCart();
                     } catch (e) {
-                        console.error('Secondary: Failed to clear cart on logout', e);
+                        console.error('Failed to clear cart on logout', e);
                     }
                 }
             },
 
+            // ==========================
+            // CHECK AUTH
+            // ==========================
             checkAuth: async () => {
-                // Internal initialization guard to prevent double-calls
                 const store = useAuthStore as unknown as { _isInitializing?: boolean };
+
                 if (store._isInitializing) return;
                 store._isInitializing = true;
 
                 set({ isCheckingAuth: true });
 
-                // Cold-load guard: if no user is persisted in state, no session was ever
-                // established — skip the /api/auth/me network call entirely to prevent
-                // the 401 → refresh attempt → 401 cascade on unauthenticated page loads.
                 const currentUser = useAuthStore.getState().user;
+
+                // Skip unnecessary API call if no user
                 if (!currentUser) {
                     set({ user: null, isCheckingAuth: false });
-                    (useAuthStore as unknown as { _isInitializing?: boolean })._isInitializing = false;
+                    store._isInitializing = false;
                     return;
                 }
 
                 try {
                     const { data } = await api.get('/auth/me');
-                    const userObj = data.data.user;
-                    set({ user: userObj, isCheckingAuth: false });
+
+                    // ✅ FIX: correct parsing
+                    const userObj = data?.user;
+
+                    set({
+                        user: userObj || null,
+                        isCheckingAuth: false
+                    });
 
                     if (userObj) {
-                        // Background fetch cart - isolated and non-blocking
                         setTimeout(() => {
                             useCartStore.getState().fetchCart().catch(err =>
-                                console.error('Secondary: Cart fetch failed during checkAuth', err)
+                                console.error('Cart fetch failed during checkAuth', err)
                             );
                         }, 0);
                     }
+
                 } catch (error) {
-                    set({ user: null, isCheckingAuth: false });
-                    // Don't clear storage on background check failures unless it's a 401
                     const err = error as { response?: { status?: number } };
+
+                    set({
+                        user: null,
+                        isCheckingAuth: false
+                    });
+
                     if (err.response?.status === 401) {
                         localStorage.removeItem('auth-storage');
                     }
                 } finally {
                     set({ isCheckingAuth: false });
-                    (useAuthStore as unknown as { _isInitializing?: boolean })._isInitializing = false;
+                    store._isInitializing = false;
                 }
             },
 
+            // ==========================
+            // CLEAR ERROR
+            // ==========================
             clearError: () => set({ error: null }),
         }),
         {
             name: 'auth-storage',
-            partialize: (state) => ({ user: state.user }),
+            partialize: (state) => ({
+                user: state.user
+            }),
         }
     )
 );
