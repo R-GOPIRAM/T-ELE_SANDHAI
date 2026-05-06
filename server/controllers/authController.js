@@ -2,19 +2,28 @@ const AuthService = require('../services/authService');
 const catchAsync = require('../utils/catchAsync');
 const { sendResponse } = require('../utils/response');
 
-// 🔥 Cookie config (FINAL CORRECT VERSION)
-const COOKIE_OPTIONS = {
+// 🔥 Cookie config (production-safe)
+// Notes:
+// - Do not set `domain` (breaks across preview/custom domains).
+// - `SameSite=None` is needed if you ever serve cookies cross-site.
+// - `Secure` must be true when SameSite=None; we set it dynamically for local HTTP dev.
+const COOKIE_OPTIONS_BASE = {
     httpOnly: true,
-    secure: true,          // required for HTTPS (Render)
-    sameSite: "None",      // required for Vercel → Render
-    path: "/",             // important
-    // ❌ DO NOT set domain
+    path: "/",
 };
 
 // ==========================
 // 🔐 SEND TOKEN RESPONSE
 // ==========================
-const sendTokenResponse = (user, accessToken, refreshToken, res) => {
+const sendTokenResponse = (req, user, accessToken, refreshToken, res) => {
+    const isSecureContext =
+        process.env.NODE_ENV === 'production' ? true : Boolean(req.secure);
+
+    const COOKIE_OPTIONS = {
+        ...COOKIE_OPTIONS_BASE,
+        secure: isSecureContext,
+        sameSite: isSecureContext ? 'None' : 'Lax',
+    };
 
     res.cookie("accessToken", accessToken, {
         ...COOKIE_OPTIONS,
@@ -45,7 +54,7 @@ exports.registerCustomer = catchAsync(async (req, res) => {
     const { user, accessToken, refreshToken } =
         await AuthService.registerCustomer(req.body);
 
-    sendTokenResponse(user, accessToken, refreshToken, res);
+    sendTokenResponse(req, user, accessToken, refreshToken, res);
 });
 
 // ==========================
@@ -55,7 +64,7 @@ exports.registerSeller = catchAsync(async (req, res) => {
     const { user, accessToken, refreshToken } =
         await AuthService.registerSeller(req.body);
 
-    sendTokenResponse(user, accessToken, refreshToken, res);
+    sendTokenResponse(req, user, accessToken, refreshToken, res);
 });
 
 // ==========================
@@ -69,7 +78,7 @@ exports.signup = catchAsync(async (req, res) => {
             ? await AuthService.registerSeller(req.body)
             : await AuthService.registerCustomer(req.body);
 
-    sendTokenResponse(user, accessToken, refreshToken, res);
+    sendTokenResponse(req, user, accessToken, refreshToken, res);
 });
 
 // ==========================
@@ -82,7 +91,7 @@ exports.login = catchAsync(async (req, res) => {
     const { user, accessToken, refreshToken } =
         await AuthService.login(email, password, ip);
 
-    sendTokenResponse(user, accessToken, refreshToken, res);
+    sendTokenResponse(req, user, accessToken, refreshToken, res);
 });
 
 // ==========================
@@ -92,9 +101,20 @@ exports.logout = catchAsync(async (req, res) => {
 
     await AuthService.logout(req.user.id);
 
+    const isSecureContext =
+        process.env.NODE_ENV === 'production' ? true : Boolean(req.secure);
+
     // 🔥 Must match cookie options exactly
-    res.clearCookie("accessToken", COOKIE_OPTIONS);
-    res.clearCookie("refreshToken", COOKIE_OPTIONS);
+    res.clearCookie("accessToken", {
+        ...COOKIE_OPTIONS_BASE,
+        secure: isSecureContext,
+        sameSite: isSecureContext ? 'None' : 'Lax',
+    });
+    res.clearCookie("refreshToken", {
+        ...COOKIE_OPTIONS_BASE,
+        secure: isSecureContext,
+        sameSite: isSecureContext ? 'None' : 'Lax',
+    });
 
     return sendResponse(res, 200, true, "Logged out successfully");
 });
@@ -116,7 +136,7 @@ exports.refresh = catchAsync(async (req, res) => {
     const { user, accessToken, newRefreshToken } =
         await AuthService.refreshAccessToken(refreshToken);
 
-    sendTokenResponse(user, accessToken, newRefreshToken, res);
+    sendTokenResponse(req, user, accessToken, newRefreshToken, res);
 });
 
 // ==========================

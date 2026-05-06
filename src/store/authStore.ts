@@ -144,15 +144,6 @@ export const useAuthStore = create<AuthState>()(
 
                 set({ isCheckingAuth: true });
 
-                const currentUser = useAuthStore.getState().user;
-
-                // Skip unnecessary API call if no user
-                if (!currentUser) {
-                    set({ user: null, isCheckingAuth: false });
-                    store._isInitializing = false;
-                    return;
-                }
-
                 try {
                     const { data } = await api.get('/auth/me');
 

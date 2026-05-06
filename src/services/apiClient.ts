@@ -2,10 +2,36 @@ import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import { useLocationStore } from '../store/locationStore';
 
+const isProbablyAbsoluteUrl = (value: string) => /^https?:\/\//i.test(value);
+
 // ✅ Base URL (production-safe)
-const BASE_URL =
-  import.meta.env.VITE_API_URL ||
-  (import.meta.env.PROD ? '/api' : 'http://localhost:5000/api');
+// IMPORTANT:
+// - Cookie auth must be first-party in modern browsers (3P cookies are commonly blocked).
+// - In production on Vercel, always prefer the same-origin reverse proxy route (`/api`)
+//   from `vercel.json` rewrites.
+const resolveBaseUrl = () => {
+  const configured = (import.meta.env.VITE_API_URL || '').trim();
+
+  if (import.meta.env.PROD) {
+    // Allow relative overrides (e.g. "/api", "/api/v1")
+    if (configured && configured.startsWith('/')) return configured;
+
+    // Disallow absolute URLs by default in production to avoid cross-site cookies
+    if (configured && isProbablyAbsoluteUrl(configured)) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `[apiClient] Ignoring absolute VITE_API_URL in production ("${configured}"). ` +
+          `Using "/api" to keep auth cookies first-party.`
+      );
+    }
+
+    return '/api';
+  }
+
+  return configured || 'http://localhost:5000/api';
+};
+
+const BASE_URL = resolveBaseUrl();
 
 // ✅ Axios instance
 const api = axios.create({

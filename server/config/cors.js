@@ -6,7 +6,7 @@ const DEFAULT_ALLOWED_ORIGINS = [
   "https://inspirathon-beta.vercel.app",
 ];
 
-const envOrigins = (process.env.CORS_ORIGINS || "")
+const envOrigins = (process.env.CORS_ORIGINS || process.env.ALLOWED_ORIGINS || "")
   .split(",")
   .map((o) => o.trim())
   .filter(Boolean);
@@ -54,4 +54,3 @@ const corsOptions = {
 };
 
 module.exports = corsOptions;
-

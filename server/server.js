@@ -17,6 +17,7 @@ const xssMiddleware = require("./middleware/xssSanitize");
 const { validateEnv } = require("./config/config");
 const connectDB = require("./config/database");
 const loggerMiddleware = require("./middleware/loggerMiddleware");
+const authDebugMiddleware = require("./middleware/authDebugMiddleware");
 const globalErrorHandler = require("./middleware/errorMiddleware");
 const AppError = require("./utils/AppError");
 
@@ -86,6 +87,9 @@ app.options("*", cors(corsOptions)); // 🔥 allow preflight
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 app.use(cookieParser());
+
+// Optional auth cookie diagnostics (enable with AUTH_DEBUG=true)
+app.use(["/api/auth", "/api/v1/auth"], authDebugMiddleware);
 
 // ==========================
 // 🚫 RATE LIMIT (SKIP OPTIONS)
