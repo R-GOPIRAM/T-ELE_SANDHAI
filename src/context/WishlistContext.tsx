@@ -51,7 +51,8 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
         try {
             const { data } = await api.get('/wishlist');
             if (data.success && data.data) {
-                setWishlistItems(data.data.items);
+                const items = Array.isArray(data.data?.items) ? data.data.items : [];
+                setWishlistItems(items);
             }
         } catch (error) {
             console.error('Failed to fetch wishlist', error);
@@ -69,7 +70,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
         try {
             const { data } = await api.post('/wishlist', { productId });
             if (data.success) {
-                setWishlistItems(data.data.items);
+                setWishlistItems(Array.isArray(data.data?.items) ? data.data.items : []);
                 toast.success('Added to wishlist❤️');
             }
         } catch (err: unknown) {
@@ -86,7 +87,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
         try {
             const { data } = await api.delete(`/wishlist/${productId}`);
             if (data.success) {
-                setWishlistItems(data.data.items);
+                setWishlistItems(Array.isArray(data.data?.items) ? data.data.items : []);
                 toast.success('Removed from wishlist');
             }
         } catch (_error) {

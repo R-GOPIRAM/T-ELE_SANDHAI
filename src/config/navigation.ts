@@ -30,8 +30,8 @@ export const CUSTOMER_NAV = [
     { name: 'My Orders', href: '/dashboard/orders', icon: Package },
     { name: 'Wishlist', href: '/dashboard/wishlist', icon: Heart },
     { name: 'Bargain History', href: '/dashboard/bargains', icon: History },
-    { name: 'Profile', href: '/dashboard', icon: User, end: true },
-    { name: 'Addresses', href: '/dashboard', icon: MapPin, end: true },
+    { name: 'Profile', href: '/dashboard/profile', icon: User },
+    { name: 'Addresses', href: '/dashboard/addresses', icon: MapPin },
     { name: 'Settings', href: '/dashboard/settings', icon: Settings },
 ];
 

@@ -17,7 +17,12 @@ const sellerRegSchema = z.object({
     phone: z.string().min(10, 'Valid phone number is required'),
     businessAddress: z.string().min(5, 'Store address is required'),
     city: z.string().min(2, 'City is required'),
-    password: z.string().min(6, 'Password must be at least 6 characters'),
+    password: z.string()
+        .min(8, 'Password must be at least 8 characters')
+        .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+        .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+        .regex(/[0-9]/, 'Password must contain at least one number')
+        .regex(/[^A-Za-z0-9]/, 'Password must contain at least one special character'),
 });
 
 type SellerRegFormData = z.infer<typeof sellerRegSchema>;
@@ -56,9 +61,11 @@ export default function BecomeSellerPage() {
             setIsSuccess(true);
             toast.success('Registration successful!');
         } catch (err) {
-            const error = err as { response?: { data?: { message?: string } } };
-            const message = error.response?.data?.message || 'Registration failed';
-            toast.error(message);
+            const error = err as { response?: { data?: { message?: unknown } } };
+            const raw = error.response?.data?.message;
+            const message = typeof raw === 'string' ? raw : 'Registration failed';
+            // Avoid dumping raw JSON/Zod structures into the UI
+            toast.error(message.replace(/^body\./, '').trim());
         }
     };
 

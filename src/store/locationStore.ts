@@ -90,13 +90,15 @@ export const useLocationStore = create<LocationState>()(
             updateByPincode: async (pincode) => {
                 set({ isLoading: true, error: null });
                 try {
-                    const response = await axios.get(
-                        `https://nominatim.openstreetmap.org/search?format=json&postalcode=${pincode}&country=india&addressdetails=1`,
-                        {
-                            headers: { 'User-Agent': 'T-ELE-Sandhai-Client' },
-                            timeout: 10000
-                        }
-                    );
+                    const response = await axios.get('https://nominatim.openstreetmap.org/search', {
+                        params: {
+                            format: 'json',
+                            postalcode: pincode,
+                            country: 'india',
+                            addressdetails: 1
+                        },
+                        timeout: 10000
+                    });
 
                     if (response.data && response.data.length > 0) {
                         const result = response.data[0];

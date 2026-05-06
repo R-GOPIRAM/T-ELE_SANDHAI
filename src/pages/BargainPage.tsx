@@ -14,7 +14,13 @@ export default function BargainPage() {
         const fetchBargains = async () => {
             try {
                 const { data } = await bargainService.getMyBargains();
-                setBargains(data.data);
+                const payload = data?.data;
+                const list = Array.isArray(payload)
+                    ? payload
+                    : Array.isArray(payload?.bargains)
+                        ? payload.bargains
+                        : [];
+                setBargains(list);
             } catch (error) {
                 console.error('Failed to fetch bargains', error);
             } finally {

@@ -34,6 +34,8 @@ const SellerRegistrationPage = lazy(() => import('../pages/Dashboard/SellerRegis
 const SellerVerificationPage = lazy(() => import('../pages/Dashboard/SellerVerificationPage'));
 const AddProductPage = lazy(() => import('../pages/Dashboard/AddProductPage'));
 const ReviewsPage = lazy(() => import('../pages/Dashboard/ReviewsPage'));
+const ProfileSection = lazy(() => import('../pages/Dashboard/ProfileSection'));
+const AddressSection = lazy(() => import('../pages/Dashboard/AddressSection'));
 const LogisticsDashboard = lazy(() => import('../pages/Admin/LogisticsDashboard'));
 const StoreManagement = lazy(() => import('../pages/Admin/StoreManagement'));
 const SellerApprovalPage = lazy(() => import('../pages/Admin/SellerApprovalPage'));
@@ -87,6 +89,8 @@ const AppRoutes = () => {
                         <Route path="wishlist" element={<WishlistPage />} />
                         <Route path="bargains" element={<BargainPage />} />
                         <Route path="reviews" element={<ReviewsPage />} />
+                        <Route path="profile" element={<ProfileSection />} />
+                        <Route path="addresses" element={<AddressSection />} />
                         <Route path="settings" element={<div>Settings (Coming Soon)</div>} />
 
                         {/* Seller Dashboard Nesting */}

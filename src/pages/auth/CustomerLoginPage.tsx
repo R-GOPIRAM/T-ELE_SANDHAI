@@ -89,12 +89,13 @@ export default function CustomerLoginPage() {
 
         navigate('/dashboard'); // better UX than '/'
         
-    } catch (err: any) {
+    } catch (err: unknown) {
         console.error("REGISTER ERROR:", err);
 
+        const error = err as { response?: { data?: { message?: string } }, message?: string };
         const message =
-            err?.response?.data?.message ||
-            err?.message ||
+            error?.response?.data?.message ||
+            error?.message ||
             'Something went wrong';
 
         toast.error(message);

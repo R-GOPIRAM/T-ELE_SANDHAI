@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Search, Filter, Grid, List, X, Check, ChevronDown, Star } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -8,6 +9,7 @@ import ProductSkeleton from '../features/products/ProductSkeleton';
 import { useProductStore } from '../store/productStore';
 
 export default function ProductsPage() {
+  const [searchParams] = useSearchParams();
   // Query State
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -51,6 +53,19 @@ export default function ProductsPage() {
     const uniqueBrands = new Set(products.map(p => p.brand).filter(Boolean));
     return ['', ...Array.from(uniqueBrands)].sort();
   }, [products]);
+
+  // Sync URL query (?search= / ?category= / ?brand=) into UI state on navigation.
+  useEffect(() => {
+    const urlSearch = searchParams.get('search') || '';
+    const urlCategory = searchParams.get('category') || '';
+    const urlBrand = searchParams.get('brand') || '';
+
+    // Only update when the URL has a value and the UI differs (prevents infinite loops)
+    if (urlSearch && urlSearch !== searchTerm) setSearchTerm(urlSearch);
+    if (urlCategory && urlCategory !== selectedCategory) setSelectedCategory(urlCategory);
+    if (urlBrand && urlBrand !== selectedBrand) setSelectedBrand(urlBrand);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   useEffect(() => {
     const controller = new AbortController();

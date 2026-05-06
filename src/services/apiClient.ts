@@ -18,7 +18,6 @@ const resolveBaseUrl = () => {
 
     // Disallow absolute URLs by default in production to avoid cross-site cookies
     if (configured && isProbablyAbsoluteUrl(configured)) {
-      // eslint-disable-next-line no-console
       console.warn(
         `[apiClient] Ignoring absolute VITE_API_URL in production ("${configured}"). ` +
           `Using "/api" to keep auth cookies first-party.`
