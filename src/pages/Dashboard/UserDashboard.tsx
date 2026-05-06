@@ -175,6 +175,9 @@ function DashboardOverview({ onTabChange }: { onTabChange: (tab: TabId) => void 
     const [recommendedProducts, setRecommendedProducts] = useState<Product[]>([]);
     const [nearbyStores, setNearbyStores] = useState<Product[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const getProductId = useCallback((p: Product) => {
+        return (p as unknown as { id?: string; _id?: string }).id || (p as unknown as { _id?: string })._id || '';
+    }, []);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -189,13 +192,24 @@ function DashboardOverview({ onTabChange }: { onTabChange: (tab: TabId) => void 
                     setRecentOrders(ordersRes.data.data.orders);
                 }
                 if (productsRes.data.success) {
-                    setRecommendedProducts(productsRes.data.data);
+                    const payload = productsRes.data?.data;
+                    const products = Array.isArray(payload)
+                        ? payload
+                        : Array.isArray(payload?.products)
+                            ? payload.products
+                            : [];
+                    setRecommendedProducts(products);
                 }
 
                 // For nearby stores, we'll fetch top rated sellers
                 const storesRes = await api.get('/products?limit=3&sort=-rating');
                 if (storesRes.data.success) {
-                    const products = storesRes.data.data as Product[];
+                    const payload = storesRes.data?.data;
+                    const products = (Array.isArray(payload)
+                        ? payload
+                        : Array.isArray(payload?.products)
+                            ? payload.products
+                            : []) as Product[];
                     const sellerIds = Array.from(new Set(products.map((p) => p.sellerId)));
                     const uniqueSellers = sellerIds
                         .map((id) => products.find((p) => p.sellerId === id))
@@ -350,8 +364,15 @@ function DashboardOverview({ onTabChange }: { onTabChange: (tab: TabId) => void 
                             <div className="grid grid-cols-2 gap-4">
                                 {isLoading ? (
                                     Array(2).fill(0).map((_, i) => <div key={i} className="h-48 bg-border/50 animate-pulse rounded-2xl" />)
-                                ) : recommendedProducts.slice(0, 2).map((product) => (
-                                    <div key={product.id} className="group cursor-pointer" onClick={() => navigate(`/product/${product.id}`)}>
+                                ) : (Array.isArray(recommendedProducts) ? recommendedProducts : []).slice(0, 2).map((product) => (
+                                    <div
+                                        key={getProductId(product) || product.name}
+                                        className="group cursor-pointer"
+                                        onClick={() => {
+                                            const productId = getProductId(product);
+                                            if (productId) navigate(`/product/${productId}`);
+                                        }}
+                                    >
                                         <div className="aspect-square bg-background rounded-2xl overflow-hidden mb-3 border border-border group-hover:border-primary/50 transition-colors">
                                             <img src={product.images?.[0]} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                                         </div>
