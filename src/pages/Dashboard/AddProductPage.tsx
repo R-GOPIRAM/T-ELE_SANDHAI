@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
   ArrowLeft,
@@ -67,7 +66,26 @@ export default function AddProductPage() {
     formState: { errors },
     trigger
   } = useForm<ProductFormData>({
-    resolver: zodResolver(productSchema),
+    resolver: async (values, _context, options) => {
+      try {
+        const parsed = productSchema.parse(values);
+        return { values: parsed, errors: {} };
+      } catch (err) {
+        const zodError = err as { issues?: Array<{ path?: (string | number)[]; message?: string; code?: string }> };
+        const errors: Record<string, any> = {};
+        (zodError.issues || []).forEach((issue) => {
+          const path = (issue.path || []).join('.');
+          if (!path) return;
+          errors[path] = { type: issue.code || 'validation', message: issue.message || 'Invalid value' };
+        });
+        // react-hook-form expects nested errors; but flat keys still surface messages via `errors.<field>.message`
+        return { values: {}, errors };
+      } finally {
+        if (options?.shouldUseNativeValidation) {
+          // no-op; keep parity with RHF resolver signature
+        }
+      }
+    },
     defaultValues: {
       features: [''],
       specifications: [{ key: '', value: '' }],
