@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo, memo } from 'react';
 import {
   BarChart2,
+  Boxes,
+  LayoutDashboard,
   Package,
   ShoppingBag,
   MessageSquare,
