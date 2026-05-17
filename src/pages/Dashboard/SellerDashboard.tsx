@@ -17,6 +17,7 @@ import {
   History,
   ArrowUpRight,
   Zap,
+  Eye,
   Search
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
