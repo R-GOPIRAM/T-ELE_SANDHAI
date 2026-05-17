@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo, memo } from 'react';
 import {
+  AlertCircle,
   BarChart2,
   Boxes,
   DollarSign,
