@@ -38,11 +38,11 @@ export const CUSTOMER_NAV = [
 export const SELLER_NAV = [
     { name: 'Overview', href: '/dashboard/seller', icon: LayoutDashboard, end: true },
     { name: 'Add Product', href: '/dashboard/seller/add-product', icon: Package },
-    { name: 'My Inventory', href: '/dashboard/seller', icon: Store },
+    { name: 'My Inventory', href: '/dashboard/seller/inventory', icon: Store },
     { name: 'Orders', href: '/dashboard/seller/orders', icon: Package },
     { name: 'Bargain Requests', href: '/dashboard/bargains', icon: MessageSquare },
     { name: 'Verification', href: '/dashboard/seller/verification', icon: ShieldCheck },
-    { name: 'Analytics', href: '/dashboard/seller', icon: BarChart3 },
+    { name: 'Analytics', href: '/dashboard/seller/analytics', icon: BarChart3 },
     { name: 'Settings', href: '/dashboard/settings', icon: Settings },
 ];
 

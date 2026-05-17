@@ -62,3 +62,11 @@ exports.getSellerProducts = catchAsync(async (req, res) => {
         }
     });
 });
+
+// Upload product images (stored locally under /uploads/product-images)
+exports.uploadProductImages = catchAsync(async (req, res) => {
+    const files = Array.isArray(req.files) ? req.files : [];
+    const urls = files.map((f) => `/uploads/product-images/${f.filename}`);
+
+    return sendResponse(res, 200, true, 'Images uploaded', { urls });
+});

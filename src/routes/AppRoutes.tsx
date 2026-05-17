@@ -27,6 +27,8 @@ const NearbyStoresPage = lazy(() => import('../pages/NearbyStoresPage'));
 // Dashboard Pages
 const UserDashboard = lazy(() => import('../pages/Dashboard/UserDashboard'));
 const SellerDashboard = lazy(() => import('../pages/Dashboard/SellerDashboard'));
+const SellerInventory = lazy(() => import('../pages/Dashboard/SellerInventory'));
+const SellerAnalytics = lazy(() => import('../pages/Dashboard/SellerAnalytics'));
 const MyOrdersPage = lazy(() => import('../pages/Dashboard/MyOrdersPage'));
 const WishlistPage = lazy(() => import('../pages/Dashboard/WishlistPage'));
 const SellerOrdersPage = lazy(() => import('../pages/Dashboard/SellerOrdersPage'));
@@ -96,6 +98,8 @@ const AppRoutes = () => {
                         {/* Seller Dashboard Nesting */}
                         <Route element={<ProtectedRoute allowedRoles={['seller']} />}>
                             <Route path="seller" element={<SellerDashboard />} />
+                            <Route path="seller/inventory" element={<SellerInventory />} />
+                            <Route path="seller/analytics" element={<SellerAnalytics />} />
                             <Route path="seller/orders" element={<SellerOrdersPage />} />
                             <Route path="seller/add-product" element={<AddProductPage />} />
                             <Route path="seller/edit-product/:id" element={<AddProductPage />} />

@@ -187,11 +187,35 @@ export default function AddProductPage() {
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    // Mock upload - in production this would be S3/Cloudinary
-    const imageUrls = files.map(() =>
-      `https://images.pexels.com/photos/788946/pexels-photo-788946.jpeg?auto=compress&cs=tinysrgb&w=400`
-    );
-    setValue('images', [...images, ...imageUrls].slice(0, 5));
+    if (files.length === 0) return;
+
+    const upload = async () => {
+      try {
+        const formData = new FormData();
+        files.slice(0, Math.max(0, 5 - images.length)).forEach((file) => {
+          formData.append('images', file);
+        });
+
+        const { data } = await api.post('/products/upload-images', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+
+        const urls = data?.data?.urls;
+        if (!Array.isArray(urls) || urls.length === 0) {
+          throw new Error('Upload failed');
+        }
+
+        setValue('images', [...images, ...urls].slice(0, 5), { shouldDirty: true, shouldValidate: true });
+        toast.success('Images uploaded');
+      } catch (_err) {
+        toast.error('Failed to upload images');
+      } finally {
+        // allow re-uploading the same file
+        e.target.value = '';
+      }
+    };
+
+    upload();
   };
 
   return (

@@ -3,6 +3,7 @@ const productController = require('../controllers/productController');
 const { protect, restrictTo } = require('../middleware/authMiddleware');
 const validate = require('../middleware/validateResource');
 const { createProductSchema, updateProductSchema } = require('../validators/product.schema');
+const productImageUpload = require('../middleware/productUploadMiddleware');
 
 const router = express.Router();
 
@@ -16,6 +17,14 @@ router.route('/')
     );
 
 router.get('/seller/my-products', protect, restrictTo('seller'), productController.getSellerProducts);
+
+router.post(
+    '/upload-images',
+    protect,
+    restrictTo('seller', 'admin'),
+    productImageUpload.array('images', 5),
+    productController.uploadProductImages
+);
 
 router.route('/:id')
     .get(productController.getProduct)
