@@ -13,7 +13,10 @@ const createProductSchema = z.object({
         brand: z.string().optional(),
         isAvailable: z.boolean().optional(),
         features: z.array(z.string()).optional(),
-        specifications: z.record(z.string()).optional(),
+        // NOTE: `z.record(...)` is triggering a runtime crash in this backend build
+        // ("Cannot read properties of undefined (reading '_zod')") when parsing objects.
+        // Use catchall object instead (validates string values).
+        specifications: z.object({}).catchall(z.string()).optional(),
     }),
 });
 
@@ -33,7 +36,7 @@ const updateProductSchema = z.object({
         brand: z.string().optional(),
         isAvailable: z.boolean().optional(),
         features: z.array(z.string()).optional(),
-        specifications: z.record(z.string()).optional(),
+        specifications: z.object({}).catchall(z.string()).optional(),
     }),
 });
 
