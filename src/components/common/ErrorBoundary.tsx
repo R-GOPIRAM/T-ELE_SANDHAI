@@ -36,7 +36,7 @@ class ErrorBoundary extends Component<Props, State> {
 
                         <h2 className="text-3xl font-extrabold text-text-primary mb-4 tracking-tight">System Encountered an Error</h2>
                         <p className="text-lg text-text-secondary mb-8 font-medium">
-                            We've encountered a synchronized state mismatch. Don't worry, your data is safe.
+                            Something went wrong while rendering this page. You can restart the session or return home.
                         </p>
 
                         {this.state.error && (

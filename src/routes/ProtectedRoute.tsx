@@ -26,7 +26,16 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
 
     // If no user, redirect to login
     if (!user) {
-        return <Navigate to="/login/customer" state={{ from: location }} replace />;
+        const inferred =
+            location.pathname.startsWith('/admin') ? '/admin/login' :
+                location.pathname.startsWith('/dashboard/seller') ? '/login/seller' :
+                    '/login/customer';
+
+        const loginTarget =
+            allowedRoles?.includes('admin') ? '/admin/login' :
+                allowedRoles?.includes('seller') ? '/login/seller' :
+                    inferred;
+        return <Navigate to={loginTarget} state={{ from: location }} replace />;
     }
 
     // If roles are specified, check if user has permission

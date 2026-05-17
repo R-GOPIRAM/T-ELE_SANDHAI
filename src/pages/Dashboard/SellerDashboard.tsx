@@ -5,6 +5,7 @@ import {
   DollarSign,
   LayoutDashboard,
   Package,
+  Plus,
   ShoppingBag,
   MessageSquare,
   ChevronRight,
@@ -164,7 +165,7 @@ const OverviewTab = memo(({
   const navigate = useNavigate();
 
   const stats = useMemo(() => [
-    { title: 'Total Revenue', value: `₹${analytics?.summary.totalRevenue.toLocaleString() || '0'}`, icon: DollarSign, color: 'emerald' },
+    { title: 'Total Revenue', value: `₹${(analytics?.summary?.totalRevenue ?? 0).toLocaleString()}`, icon: DollarSign, color: 'emerald' },
     { title: 'Orders Today', value: analytics?.summary.ordersToday || 0, icon: ShoppingBag, color: 'blue' },
     { title: 'Total Orders', value: analytics?.summary.totalOrders || 0, icon: ShoppingBag, color: 'indigo' },
     { title: 'Inventory', value: products.length, icon: Package, color: 'amber' },
@@ -369,7 +370,7 @@ const OverviewTab = memo(({
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
-                {analytics?.topProducts.slice(0, 5).map((p, idx) => (
+                {(analytics?.topProducts ?? []).slice(0, 5).map((p, idx) => (
                   <tr key={idx} className="group hover:bg-background/30">
                     <td className="px-8 py-4 font-black text-text-primary uppercase text-xs truncate max-w-[200px]">{p.name}</td>
                     <td className="px-8 py-4 text-center font-bold text-text-secondary/50">{p.sales}</td>

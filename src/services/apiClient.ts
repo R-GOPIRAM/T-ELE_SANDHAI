@@ -105,7 +105,12 @@ api.interceptors.response.use(
 
         if (!isLoginPage) {
           toast.error('Session expired. Please login again.');
-          window.location.href = '/login/customer';
+          const path = window.location.pathname;
+          const redirect =
+            path.startsWith('/admin') ? '/admin/login' :
+              path.startsWith('/dashboard/seller') ? '/login/seller' :
+                '/login/customer';
+          window.location.href = redirect;
         }
 
         return Promise.reject(refreshError);
