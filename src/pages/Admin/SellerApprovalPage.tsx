@@ -74,7 +74,9 @@ export default function SellerApprovalPage() {
         setLoading(true);
         try {
             const { data } = await api.get('/sellers/admin/all');
-            setSellers(data.data || []);
+            const payload = data?.data;
+            const list = Array.isArray(payload) ? payload : payload?.sellers;
+            setSellers(Array.isArray(list) ? list : []);
         } catch {
             toast.error('Failed to fetch sellers');
         } finally {

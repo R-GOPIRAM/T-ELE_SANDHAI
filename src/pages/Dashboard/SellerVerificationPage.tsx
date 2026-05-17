@@ -20,7 +20,9 @@ export default function SellerVerificationPage() {
   const fetchSellers = async () => {
     try {
       const { data } = await api.get('/sellers/admin/all');
-      setSellers(data.data);
+      const payload = data?.data;
+      const list = Array.isArray(payload) ? payload : payload?.sellers;
+      setSellers(Array.isArray(list) ? list : []);
     } catch (error) {
       console.error('Failed to fetch sellers', error);
     } finally {
@@ -28,8 +30,16 @@ export default function SellerVerificationPage() {
     }
   };
 
+  const getSellerStatus = (seller: Seller) =>
+    (seller.verificationStatus ??
+      (seller as unknown as { sellerStatus?: 'pending' | 'approved' | 'rejected' }).sellerStatus) as
+      | 'pending'
+      | 'approved'
+      | 'rejected'
+      | undefined;
+
   const filteredSellers = sellers.filter(seller =>
-    filter === 'all' || seller.verificationStatus === filter
+    filter === 'all' || getSellerStatus(seller) === filter
   );
 
   const handleApprove = async (sellerId: string) => {
@@ -109,9 +119,9 @@ export default function SellerVerificationPage() {
             <nav className="flex space-x-8 px-6">
               {[
                 { key: 'all', label: 'All Applications', count: sellers.length },
-                { key: 'pending', label: 'Pending Review', count: sellers.filter(s => s.verificationStatus === 'pending').length },
-                { key: 'approved', label: 'Approved', count: sellers.filter(s => s.verificationStatus === 'approved').length },
-                { key: 'rejected', label: 'Rejected', count: sellers.filter(s => s.verificationStatus === 'rejected').length }
+                { key: 'pending', label: 'Pending Review', count: sellers.filter(s => getSellerStatus(s) === 'pending').length },
+                { key: 'approved', label: 'Approved', count: sellers.filter(s => getSellerStatus(s) === 'approved').length },
+                { key: 'rejected', label: 'Rejected', count: sellers.filter(s => getSellerStatus(s) === 'rejected').length }
               ].map((tab) => (
                 <button
                   key={tab.key}
