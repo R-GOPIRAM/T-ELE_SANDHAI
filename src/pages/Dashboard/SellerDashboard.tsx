@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo, memo } from 'react';
 import {
   BarChart2,
   Boxes,
+  DollarSign,
   LayoutDashboard,
   Package,
   ShoppingBag,
