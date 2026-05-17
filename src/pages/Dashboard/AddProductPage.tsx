@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
+import { z } from 'zod';
 import {
   ArrowLeft,
   Plus,
@@ -31,11 +31,14 @@ const productSchema = z.object({
   name: z.string().min(3, 'Product name must be at least 3 characters'),
   brand: z.string().min(2, 'Brand name is required'),
   description: z.string().min(20, 'Description must be at least 20 characters'),
-  price: z.number().min(1, 'Price must be greater than 0'),
-  originalPrice: z.number().optional().nullable(),
+  price: z.coerce.number().min(1, 'Price must be greater than 0'),
+  originalPrice: z.preprocess(
+    (v) => (v === '' || v === undefined ? null : v),
+    z.coerce.number().nullable().optional()
+  ),
   category: z.string().min(1, 'Category is required'),
   subcategory: z.string().optional(),
-  stock: z.number().min(0, 'Stock cannot be negative'),
+  stock: z.coerce.number().min(0, 'Stock cannot be negative'),
   features: z.array(z.string().min(1, 'Feature cannot be empty')).min(1, 'Add at least one feature'),
   specifications: z.array(z.object({
     key: z.string().min(1, 'Key is required'),
